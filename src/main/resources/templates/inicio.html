@@ -1,217 +1,326 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>Lectio - Desafío de Lectura</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Caveat&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
     <style>
         * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
         }
-
         body {
-          font-family: 'Poppins', sans-serif;
-          display: flex;
-          min-height: 100vh;
-          background: linear-gradient(135deg, #e8f8f5 0%, #fdfdfd 100%);
-          color: #2c3e50;
-          padding-right: 290px;
-          overflow-x: hidden;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #e8f8f5 0%, #fdfdfd 100%);
+        color: #2c3e50;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
         }
-
-        main {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          overflow: hidden;
-          text-align: center;
-          padding: 40px;
+        /* Header with hamburger button for mobile */
+        header {
+        background: #27ae60;
+        color: #fff;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        width: 100%;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .contenido {
-          z-index: 2;
-          max-width: 650px;
-          padding: 40px;
-          background: rgba(255, 255, 255, 0.88);
-          border-radius: 25px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-          backdrop-filter: blur(10px);
-          animation: fadeIn 1s ease forwards;
-          transition: all 0.4s ease;
+        header h1 {
+        font-weight: 700;
+        font-size: 1.5rem;
+        user-select: none;
         }
-
-        .contenido:hover {
-          transform: scale(1.02);
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        /* Hamburger icon */
+        .menu-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         }
-
-        h1 {
-          color: #27ae60;
-          font-size: 2.4rem;
-          margin-bottom: 14px;
-          letter-spacing: 1px;
-          font-weight: 700;
+        .menu-toggle span {
+        display: block;
+        height: 3px;
+        background: white;
+        border-radius: 2px;
+        transition: all 0.3s ease;
         }
-
-        p {
-          color: #444;
-          line-height: 1.7;
-          margin-bottom: 28px;
-          font-size: 1.05rem;
-        }
-
-        /* ======= BOTONES ======= */
-        .btn-container {
-          display: flex;
-          gap: 15px;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .btn {
-          background: #27ae60;
-          color: #fff;
-          border: none;
-          padding: 14px 30px;
-          border-radius: 10px;
-          font-size: 1.1rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .btn:hover {
-          background: #219150;
-          transform: translateY(-3px);
-          box-shadow: 0 6px 15px rgba(39, 174, 96, 0.35);
-        }
-
-        .btn-secondary {
-          background: #3498db;
-          box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-        }
-
-        .btn-secondary:hover {
-          background: #2980b9;
-          box-shadow: 0 6px 15px rgba(52, 152, 219, 0.35);
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
+        /* Sidebar styling */
         aside {
-          width: 250px;
-          background: linear-gradient(180deg, #2ecc71, #27ae60);
-          padding: 30px 20px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
-          border-radius: 25px 0 0 25px;
-          z-index: 10;
-          position: fixed;
-          top: 0;
-          right: 0;
-          height: 100vh;
-          overflow-y: auto;
+        position: fixed;
+        top: 60px;
+        right: 0;
+        width: 270px;
+        height: calc(100vh - 60px);
+        background: linear-gradient(180deg, #2ecc71, #27ae60);
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+        border-radius: 25px 0 0 25px;
+        padding: 30px 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transform: translateX(0);
+        transition: transform 0.35s ease;
+        z-index: 90;
         }
-
+        aside.hide {
+        transform: translateX(100%);
+        }
         aside h2 {
-          text-align: center;
-          color: #fff;
-          margin-bottom: 30px;
-          font-weight: 700;
-          font-size: 1.6rem;
-          letter-spacing: 1px;
+        text-align: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+        margin-bottom: 35px;
+        user-select: none;
         }
-
         aside ul {
-          list-style: none;
-          padding: 0;
+        list-style: none;
         }
-
         aside li {
-          margin: 18px 0;
-          cursor: pointer;
-          color: #fff;
-          font-weight: 500;
-          font-size: 1.05rem;
-          padding: 10px 15px;
-          border-radius: 12px;
-          transition: all 0.3s ease;
-          background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 12px 20px;
+        margin: 18px 0;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: background 0.3s ease, transform 0.3s ease;
+        user-select: none;
         }
-
         aside li:hover {
-          background: rgba(255, 255, 255, 0.25);
-          transform: translateX(-4px);
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-6px);
         }
-
         .footer {
-          text-align: center;
-          color: #ecf0f1;
-          font-size: 0.85rem;
-          padding-top: 10px;
-          opacity: 0.9;
+        color: #ecf0f1;
+        font-size: 0.85rem;
+        text-align: center;
+        opacity: 0.9;
+        user-select: none;
         }
-
+        main {
+        flex: 1;
+        padding: 100px 20px 40px 20px;
+        max-width: 700px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        }
+        .contenido {
+        background: rgba(255, 255, 255, 0.92);
+        padding: 45px 40px;
+        border-radius: 25px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .contenido:hover {
+        transform: scale(1.03);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        h1 {
+        color: #27ae60;
+        font-size: 2.6rem;
+        letter-spacing: 1.2px;
+        margin-bottom: 16px;
+        font-weight: 700;
+        }
+        p {
+        color: #444;
+        font-size: 1.1rem;
+        margin-bottom: 32px;
+        line-height: 1.7;
+        }
+        .btn-container {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        }
+        button.btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 1.15rem;
+        padding: 15px 36px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(39, 174, 96, 0.3);
+        background: #27ae60;
+        color: white;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        button.btn:hover {
+        background: #219150;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(39, 174, 96, 0.4);
+        }
+        button.btn-secondary {
+        background: #3498db;
+        box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
+        }
+        button.btn-secondary:hover {
+        background: #2980b9;
+        box-shadow: 0 8px 22px rgba(52, 152, 219, 0.4);
+        }
+        /* Bubble backgrounds */
         .burbuja {
-          position: absolute;
-          background: radial-gradient(circle at 30% 30%, rgba(39, 174, 96, 0.5), rgba(39, 174, 96, 0.15));
-          border-radius: 50%;
-          opacity: 0.9;
-          bottom: -120px;
-          animation: flotar 10s linear infinite;
-          filter: blur(0.5px);
+        position: absolute;
+        background: radial-gradient(circle at 30% 30%, rgba(39, 174, 96, 0.5), rgba(39, 174, 96, 0.15));
+        border-radius: 50%;
+        opacity: 0.9;
+        bottom: -120px;
+        animation: flotar 10s linear infinite;
+        filter: blur(0.5px);
+        pointer-events: none;
+        z-index: 1;
         }
 
         @keyframes flotar {
-          0% {
-            transform: translateY(0) scale(0.8);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.7;
-          }
-          50% {
-            transform: translateY(-50vh) scale(1);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(-110vh) scale(1.2);
-            opacity: 0;
-          }
+        0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+        }
+        10% {
+        opacity: 0.7;
+        }
+        50% {
+        transform: translateY(-50vh) scale(1);
+        opacity: 1;
+        }
+        100% {
+        transform: translateY(-110vh) scale(1.2);
+        opacity: 0;
+        }
+        }
+
+        /* Icons as SVG inline */
+        svg.icon {
+        fill: white;
+        width: 22px;
+        height: 22px;
+        }
+        /* Responsive for mobile */
+        @media (max-width: 900px) {
+        body {
+        padding-right: 0;
+        }
+        aside {
+        top: 60px;
+        right: 0;
+        width: 220px;
+        height: calc(100vh - 60px);
+        border-radius: 0 0 0 25px;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+        }
+        main {
+        padding: 90px 15px 35px 15px;
+        max-width: 100%;
+        }
+        .btn-container {
+        gap: 12px;
+        }
+        button.btn, button.btn-secondary {
+        font-size: 1rem;
+        padding: 12px 28px;
+        }
+        }
+        @media (max-width: 600px) {
+        header h1 {
+        font-size: 1.3rem;
+        }
+        /* Mobile aside off-screen by default */
+        aside {
+        position: fixed;
+        top: 60px;
+        right: 0;
+        width: 220px;
+        height: calc(100vh - 60px);
+        transform: translateX(100%);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+        border-radius: 0 0 0 25px;
+        transition: transform 0.3s ease;
+        }
+        aside.show {
+        transform: translateX(0);
+        z-index: 200;
+        }
+        /* Adjust buttons and spacing */
+        .btn-container {
+        flex-direction: column;
+        gap: 14px;
+        }
         }
     </style>
 </head>
-
 <body>
-<main>
-    <div class="contenido">
-        <h1>Desafío de Lectura 📖</h1>
-        <p>Sumérgete en nuevas historias, descubre perspectivas únicas y haz de la lectura un hábito inspirador.
-            Aquí comienza tu viaje literario: cada página es una puerta hacia un mundo distinto,
-            y cada historia, una forma de crecer y soñar.</p>
+<header>
+    <h1>Lectio</h1>
+    <button aria-label="Abrir menú" class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+</header>
 
+<aside id="sidebar" aria-label="Navegación principal" class="hide">
+    <div>
+        <h2>LECTIO</h2>
+        <ul>
+            <li onclick="location.href='/api/libros'">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 2H9a2 2 0 0 0-2 2v16c0 .55.45 1 1 1h12a2 2 0 0 0 2-2V4c0-1.1-.9-2-2-2zM9 20V4h10v16H9zm-6 0h2V8H3v12zm0-16v2h2V4H3z"/></svg>
+                Biblioteca
+            </li>
+            <li onclick="location.href='/api/historia_pensamiento'">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 2.76 2.24 5 5 5 .13 0 .26 0 .39-.02l-.08.28-1.52 3.45 2.5-1.01.5.62c.89.35 1.81.55 2.81.55a7 7 0 0 0 0-14z"/></svg>
+                Historia del Pensamiento
+            </li>
+            <li onclick="location.href='/api/inicio'">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5v10z"/></svg>
+                Volver a Inicio
+            </li>
+        </ul>
+    </div>
+    <div class="footer">© 2025 Lectio</div>
+</aside>
+
+<main>
+    <div class="contenido" role="main">
+        <h1>Desafío de Lectura
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align: middle;">
+                <path d="M19 2H9a2 2 0 0 0-2 2v16c0 .55.45 1 1 1h12a2 2 0 0 0 2-2V4c0-1.1-.9-2-2-2zM9 20V4h10v16H9zm-6 0h2V8H3v12zm0-16v2h2V4H3z"/>
+            </svg>
+        </h1>
+        <p>
+            Sumérgete en nuevas historias, descubre perspectivas únicas y haz de la lectura un hábito inspirador.
+            Aquí comienza tu viaje literario: cada página es una puerta hacia un mundo distinto,
+            y cada historia, una forma de crecer y soñar.
+        </p>
         <div class="btn-container">
-            <button class="btn" onclick="location.href='/api/libros'">
-                📚 Explorar Libros
+            <button class="btn" onclick="location.href='/api/libros'" aria-label="Explorar Libros">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 2H9a2 2 0 0 0-2 2v16c0 .55.45 1 1 1h12a2 2 0 0 0 2-2V4c0-1.1-.9-2-2-2zM9 20V4h10v16H9zm-6 0h2V8H3v12zm0-16v2h2V4H3z"/></svg>
+                Explorar Libros
             </button>
-            <button class="btn btn-secondary" onclick="location.href='/api/logiado'">
-                🏠 Volver a Biblioteca
+            <button class="btn btn-secondary" onclick="location.href='/api/logiado'" aria-label="Volver a Biblioteca">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5v10z"/></svg>
+                Volver a Biblioteca
             </button>
         </div>
     </div>
@@ -225,16 +334,45 @@
     <div class="burbuja" style="width:70px; height:70px; left:75%; animation-delay:1s;"></div>
 </main>
 
-<aside>
-    <div>
-        <h2>LECTIO</h2>
-        <ul>
-            <li onclick="location.href='/api/libros'">📚 Biblioteca</li>
-            <li onclick="location.href='/api/historia_pensamiento'">💡 Historia del Pensamiento</li>
-            <li onclick="location.href='/api/logiado'">🏠 Volver a Inicio</li>
-        </ul>
-    </div>
-    <div class="footer">© 2025 Lectio</div>
-</aside>
+<script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('show');
+    sidebar.classList.toggle('hide');
+    // Animate hamburger to cross
+    menuToggle.classList.toggle('open');
+    });
+
+    // Change hamburger icon to cross when open
+    menuToggle.addEventListener('click', () => {
+    const spans = menuToggle.querySelectorAll('span');
+    if(menuToggle.classList.contains('open')) {
+    spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+    spans[1].style.opacity = '0';
+    spans[2].style.transform = 'rotate(-45deg) translate(6px, -6px)';
+    } else {
+    spans[0].style.transform = 'none';
+    spans[1].style.opacity = '1';
+    spans[2].style.transform = 'none';
+    }
+    });
+
+    // Optional: close sidebar when clicking outside or on link
+    document.addEventListener('click', (e) => {
+    if(!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+    if(sidebar.classList.contains('show')) {
+    sidebar.classList.remove('show');
+    sidebar.classList.add('hide');
+    menuToggle.classList.remove('open');
+    const spans = menuToggle.querySelectorAll('span');
+    spans[0].style.transform = 'none';
+    spans[1].style.opacity = '1';
+    spans[2].style.transform = 'none';
+    }
+    }
+    });
+</script>
 </body>
 </html>

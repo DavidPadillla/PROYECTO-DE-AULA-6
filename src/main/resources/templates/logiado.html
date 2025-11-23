@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title> Lectio - Biblioteca</title>
 
-    <!-- CSS principal (apunta a tu ruta) -->
+    <!-- CSS principal -->
     <link rel="stylesheet" href="/estilos/logiado.css" />
 
     <!-- Iconos y fuentes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet"/>
 
-    <!-- CSS adicional solo para móviles + Estilo del botón Desafío -->
     <style>
-        /* Solo se aplican estos estilos en móviles */
+        /* Solo móviles */
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
@@ -36,6 +35,7 @@
                 transition: right 0.3s ease;
                 box-shadow: -5px 0 15px rgba(0,0,0,0.1);
                 z-index: 999;
+                overflow-y: auto;
             }
 
             .nav-links.active {
@@ -49,6 +49,21 @@
                 padding: 15px;
                 border-radius: 0;
                 margin: 5px 0;
+                font-weight: 600;
+                color: #2c3e50;
+                border-left: 4px solid transparent;
+                transition: background 0.3s ease, border-left-color 0.3s ease;
+            }
+
+            .nav-links a.active {
+                background-color: #e0d9ff;
+                border-left-color: #7c3aed;
+                color: #7c3aed;
+            }
+
+            .nav-links a:hover:not(.active) {
+                background-color: #f3ebff;
+                color: #7c3aed;
             }
 
             .menu-toggle {
@@ -62,6 +77,11 @@
                 font-size: 1.5rem;
                 color: #2c3e50;
                 cursor: pointer;
+                transition: color 0.3s ease;
+            }
+
+            .menu-toggle:hover {
+                color: #7c3aed;
             }
 
             .overlay {
@@ -73,10 +93,12 @@
                 background: rgba(0,0,0,0.5);
                 z-index: 998;
                 display: none;
+                transition: opacity 0.3s ease;
             }
 
             .overlay.active {
                 display: block;
+                opacity: 1;
             }
 
             .user-info {
@@ -84,6 +106,9 @@
                 flex-direction: column;
                 align-items: flex-start;
                 width: 100%;
+                padding-left: 20px;
+                font-weight: 500;
+                color: #2c3e50;
             }
 
             .shop-container, .autores-container, .contact-container {
@@ -102,14 +127,14 @@
             }
         }
 
-        /* Ocultar menú hamburguesa en desktop */
+        /* Desktop - ocultar hamburguesa */
         @media (min-width: 769px) {
             .menu-toggle, .overlay {
                 display: none !important;
             }
         }
 
-        /* Botón scroll to top para todos los dispositivos */
+        /* Botón scroll to top */
         .scroll-to-top {
             position: fixed;
             bottom: 30px;
@@ -142,7 +167,7 @@
             transform: translateY(-3px);
         }
 
-        /* Estilos para el modal de confirmación de cierre de sesión */
+        /* Modal cerrar sesión (igual que antes) */
         .logout-modal {
             position: fixed;
             top: 0;
@@ -158,12 +183,10 @@
             visibility: hidden;
             transition: all 0.3s ease;
         }
-
         .logout-modal.active {
             opacity: 1;
             visibility: visible;
         }
-
         .logout-content {
             background: white;
             padding: 30px;
@@ -175,40 +198,33 @@
             transform: scale(0.8);
             transition: transform 0.3s ease;
         }
-
         .logout-modal.active .logout-content {
             transform: scale(1);
         }
-
         .logout-icon {
             font-size: 3rem;
             color: #e74c3c;
             margin-bottom: 15px;
         }
-
         .logout-title {
             font-size: 1.5rem;
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 10px;
         }
-
         .logout-message {
             font-size: 1rem;
             color: #7f8c8d;
             margin-bottom: 25px;
             line-height: 1.5;
         }
-
         .logout-buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
         }
-
-        .logout-confirm {
+        .logout-confirm, .logout-cancel {
             padding: 10px 25px;
-            background: #e74c3c;
             color: white;
             border: none;
             border-radius: 50px;
@@ -216,29 +232,22 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-
+        .logout-confirm {
+            background: #e74c3c;
+        }
         .logout-confirm:hover {
             background: #c0392b;
             transform: translateY(-2px);
         }
-
         .logout-cancel {
-            padding: 10px 25px;
             background: #95a5a6;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
         }
-
         .logout-cancel:hover {
             background: #7f8c8d;
             transform: translateY(-2px);
         }
 
-        /* ===== BOTÓN DESAFÍO DE LECTURA - ESTILO EXACTO ===== */
+        /* Botón desafío de lectura */
         .desafio-link {
             text-decoration: none !important;
             color: white !important;
@@ -255,22 +264,18 @@
             box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4) !important;
             animation: legendario-brillo 2s ease-in-out infinite !important;
         }
-
         #desafio-icon {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             font-size: 1rem;
         }
-
         .desafio-icon-trophy {
             font-size: 1.1rem;
         }
-
         .desafio-icon-text {
             letter-spacing: 0.3px;
         }
-
         @keyframes legendario-brillo {
             0%, 100% {
                 box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
@@ -280,7 +285,6 @@
                             0 0 15px rgba(168, 85, 247, 0.3);
             }
         }
-
         .desafio-link:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 8px 25px rgba(124, 58, 237, 0.6),
@@ -300,7 +304,7 @@
     <i class="fas fa-chevron-up"></i>
 </button>
 
-<!-- Modal de confirmación de cierre de sesión -->
+<!-- Modal de cierre de sesión -->
 <div class="logout-modal" id="logoutModal">
     <div class="logout-content">
         <div class="logout-icon">
@@ -317,7 +321,6 @@
     </div>
 </div>
 
-<!-- NAVBAR (EXACTAMENTE IGUAL AL ORIGINAL para PC) -->
 <header class="navbar">
     <div class="logo">
         <h1>Lectio <span>Biblioteca</span></h1>
@@ -344,16 +347,14 @@
         </a>
     </nav>
 
-    <!-- User info fuera del nav-links para mantener estructura original en PC -->
     <div class="user-info">
         <p>Hola, <strong th:text="${username}"></strong></p>
         <button type="button" class="btn-salir" id="logoutBtn">Cerrar sesión</button>
-        <!-- Formulario oculto para el cierre de sesión real -->
         <form action="/api/logout" method="post" id="logoutForm" style="display:none;"></form>
     </div>
 </header>
 
-<!-- HERO CON VIDEO (EXACTAMENTE IGUAL) -->
+<!-- Secciones (igual) -->
 <section class="hero" id="inicio">
     <div class="hero-video-container">
         <video autoplay loop muted playsinline class="hero-video">
@@ -368,7 +369,6 @@
     </div>
 </section>
 
-<!-- COLECCIÓN (EXACTAMENTE IGUAL) -->
 <section class="section" id="coleccion">
     <h2 class="section-title">Nuestra Colección</h2>
     <p class="section-subtitle">Encuentra los mejores libros seleccionados especialmente para ti.</p>
@@ -379,14 +379,12 @@
             <p>Explora los temas más importantes de la historia humana.</p>
             <a href="https://www.gutenberg.org/cache/epub/11036/pg11036-images.html" class="btn">Leer</a>
         </div>
-
         <div class="shop-item">
             <img src="/img/libro2.jpeg" alt="Misterios del Universo">
             <h3>Misterios del Universo</h3>
             <p>Una mirada fascinante a los secretos del cosmos.</p>
             <a href="https://www.gutenberg.org/cache/epub/2591/pg2591-images.html" class="btn">Leer</a>
         </div>
-
         <div class="shop-item">
             <img src="/img/libro3.jpeg" alt="Historias de la Antigua Civilización">
             <h3>Historias de la Antigua Civilización</h3>
@@ -396,76 +394,43 @@
     </div>
 </section>
 
-<!-- AUTORES (EXACTAMENTE IGUAL) -->
 <section class="section autores" id="autores">
     <h2 class="section-title">Autores Destacados</h2>
     <div class="autores-container">
-        <div class="autor-item">
-            <i class="fas fa-user"></i>
-            <h3>Gabriel García Márquez</h3>
-            <p>"Cien Años de Soledad"</p>
-        </div>
-        <div class="autor-item">
-            <i class="fas fa-user"></i>
-            <h3>Isabel Allende</h3>
-            <p>"La Casa de los Espíritus"</p>
-        </div>
-        <div class="autor-item">
-            <i class="fas fa-user"></i>
-            <h3>Jorge Luis Borges</h3>
-            <p>"Ficciones"</p>
-        </div>
+        <div class="autor-item"><i class="fas fa-user"></i><h3>Gabriel García Márquez</h3><p>"Cien Años de Soledad"</p></div>
+        <div class="autor-item"><i class="fas fa-user"></i><h3>Isabel Allende</h3><p>"La Casa de los Espíritus"</p></div>
+        <div class="autor-item"><i class="fas fa-user"></i><h3>Jorge Luis Borges</h3><p>"Ficciones"</p></div>
     </div>
 </section>
 
-<!-- CENTRO DE AYUDA (EXACTAMENTE IGUAL) -->
 <section class="section centro-ayuda" id="centro-ayuda">
     <h2 class="section-title">Centro de Ayuda</h2>
     <p class="section-subtitle">¿Tienes dudas o necesitas asistencia? ¡Estamos para ayudarte!</p>
     <div class="contact-container">
-        <div class="contact-card">
-            <i class="fas fa-envelope"></i>
-            <h3>Escríbenos</h3>
-            <p>servicios@booklab.gov.co</p>
-        </div>
-        <div class="contact-card">
-            <i class="fas fa-phone-alt"></i>
-            <h3>Llámanos</h3>
-            <p>(+57 601) 3424100</p>
-        </div>
-        <div class="contact-card">
-            <i class="fas fa-map-marker-alt"></i>
-            <h3>Visítanos</h3>
-            <p>San Pedro Martin Cra 64 A</p>
-        </div>
+        <div class="contact-card"><i class="fas fa-envelope"></i><h3>Escríbenos</h3><p>servicios@booklab.gov.co</p></div>
+        <div class="contact-card"><i class="fas fa-phone-alt"></i><h3>Llámanos</h3><p>(+57 601) 3424100</p></div>
+        <div class="contact-card"><i class="fas fa-map-marker-alt"></i><h3>Visítanos</h3><p>San Pedro Martin Cra 64 A</p></div>
     </div>
 </section>
 
-<!-- RESEÑAS (EXACTAMENTE IGUAL) -->
 <section class="section reseñas" id="reseñas">
     <h2 class="section-title">Deja Tu Reseña</h2>
     <p class="section-subtitle">Tu opinión nos ayuda a mejorar nuestra biblioteca.</p>
-
     <form id="reseña-form" class="reseña-form">
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
-
         <label for="comentario">Comentario:</label>
         <textarea id="comentario" name="comentario" rows="4" required></textarea>
-
         <button type="submit" class="btn">Enviar Reseña</button>
         <p id="mensaje-envio" style="display:none; margin-top: 10px;"></p>
     </form>
 </section>
 
-<!-- FOOTER (EXACTAMENTE IGUAL) -->
 <footer>
     <p>&copy; 2025 BookLab Biblioteca. Todos los derechos reservados.</p>
 </footer>
 
-<!-- SCRIPTS -->
 <script>
-    /* ===== Activar link según scroll (misma lógica que el principal) ===== */
     const sections = document.querySelectorAll("section");
     const navLinks = document.querySelectorAll(".nav-links a");
 
@@ -473,15 +438,17 @@
       let current = "";
       sections.forEach((section) => {
         const sectionTop = section.offsetTop;
-        if (scrollY >= sectionTop - 120) current = section.getAttribute("id");
+        const sectionHeight = section.offsetHeight;
+        if (scrollY >= sectionTop - 150 && scrollY < sectionTop + sectionHeight - 150) {
+          current = section.getAttribute("id");
+        }
       });
       navLinks.forEach((a) => {
         a.classList.remove("active");
-        if (a.getAttribute("href").includes(current)) a.classList.add("active");
+        if (a.getAttribute("href") === "#" + current) a.classList.add("active");
       });
     });
 
-    /* ===== Menú hamburguesa SOLO para móviles ===== */
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinksContainer = document.querySelector('.nav-links');
     const overlay = document.querySelector('.overlay');
@@ -492,30 +459,23 @@
             overlay.classList.toggle('active');
             document.body.style.overflow = navLinksContainer.classList.contains('active') ? 'hidden' : '';
 
-            // Cambiar icono del menú
             const icon = this.querySelector('i');
             if (navLinksContainer.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
+                icon.classList.replace('fa-bars', 'fa-times');
             } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
+                icon.classList.replace('fa-times', 'fa-bars');
             }
         });
 
-        // Cerrar menú al hacer clic en el overlay
         overlay.addEventListener('click', function() {
             navLinksContainer.classList.remove('active');
             this.classList.remove('active');
             document.body.style.overflow = '';
 
-            // Restaurar icono del menú
             const icon = menuToggle.querySelector('i');
-            icon.classList.remove('fa-times');
-            icon.classList.add('fa-bars');
+            icon.classList.replace('fa-times', 'fa-bars');
         });
 
-        // Cerrar menú al hacer clic en un enlace (en móviles)
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
@@ -523,16 +483,13 @@
                     overlay.classList.remove('active');
                     document.body.style.overflow = '';
 
-                    // Restaurar icono del menú
                     const icon = menuToggle.querySelector('i');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
+                    icon.classList.replace('fa-times', 'fa-bars');
                 }
             });
         });
     }
 
-    /* ===== Botón de scroll to top ===== */
     const scrollToTopBtn = document.querySelector('.scroll-to-top');
 
     window.addEventListener('scroll', function() {
@@ -550,7 +507,6 @@
         });
     });
 
-    /* ===== Envío de reseña (fetch) ===== */
     document.getElementById('reseña-form').addEventListener('submit', function(event) {
       event.preventDefault();
 
@@ -599,7 +555,6 @@
       });
     });
 
-    /* ===== Confirmación de cierre de sesión ===== */
     const logoutBtn = document.getElementById('logoutBtn');
     const logoutModal = document.getElementById('logoutModal');
     const logoutConfirm = document.getElementById('logoutConfirm');
@@ -633,7 +588,7 @@
 
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && logoutModal.classList.contains('active')) {
-            logoutModal.c2lassList.remove('active');
+            logoutModal.classList.remove('active');
         }
     });
 </script>

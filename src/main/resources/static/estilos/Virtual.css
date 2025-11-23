@@ -89,62 +89,123 @@ nav {
 /* ----------- CONTENEDOR DE LIBROS ----------- */
 .shop-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 35px;
-    padding: 0 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    padding: 0 15px;
 }
 
 .shop-item {
     background: white;
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .shop-item:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-8px);
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
 }
 
 .shop-item img {
     width: 100%;
-    height: 220px;
+    height: auto;
+    max-height: 280px;
     object-fit: cover;
+    border-bottom: 3px solid #27ae60;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    transition: transform 0.35s ease;
+}
+
+.shop-item:hover img {
+    transform: scale(1.05);
 }
 
 .shop-item h3 {
-    font-size: 1.2rem;
-    margin: 15px;
+    font-size: 1.3rem;
+    margin: 16px 20px 8px;
     color: #2c3e50;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .shop-item p {
-    margin: 0 15px 15px;
-    font-size: 0.95rem;
-    color: #7f8c8d;
+    margin: 0 20px 20px;
+    font-size: 1rem;
+    color: #5a6d7c;
     flex-grow: 1;
+    line-height: 1.4;
 }
 
-/* ----------- BOTÓN ----------- */
 .shop-item a.btn {
     display: inline-block;
-    margin: 15px;
-    padding: 10px 24px;
+    margin: 0 20px 20px;
+    padding: 12px 26px;
     background-color: #27ae60;
     color: white;
     text-decoration: none;
     font-weight: 600;
-    border-radius: 30px;
-    transition: all 0.3s ease;
+    border-radius: 28px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
 }
 
 .shop-item a.btn:hover {
-    background-color: #219150;
+    background-color: #1e8449;
     transform: translateY(-3px);
+}
+
+/* Mejoras para dispositivos móviles */
+
+@media (max-width: 768px) {
+    .shop-container {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    .shop-item img {
+        max-height: 200px;
+    }
+
+    .shop-item h3 {
+        font-size: 1.1rem;
+        margin: 12px 16px 6px;
+    }
+
+    .shop-item p {
+        font-size: 0.9rem;
+        margin: 0 16px 16px;
+    }
+
+    .shop-item a.btn {
+        margin: 0 16px 16px;
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    nav {
+        padding: 22px 16px;
+    }
+
+    .nav-links {
+        gap: 8px;
+    }
+
+    .shop-container {
+        grid-template-columns: 1fr;
+        padding: 0 15px;
+        gap: 18px;
+    }
+
+    .shop-item img {
+        max-height: 180px;
+        border-radius: 15px 15px 0 0;
+    }
 }
 
 /* ----------- FOOTER ----------- */

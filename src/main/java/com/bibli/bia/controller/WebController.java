@@ -117,6 +117,11 @@ public class WebController {
         return "register";
     }
 
+    @GetMapping("/librosVirtuales")
+    public String librosVirtualess() {
+        return "librosVirtuales";
+    }
+
     @PostMapping("/register")
     public String procesarRegistro(@RequestParam String username,
                                    @RequestParam String password,

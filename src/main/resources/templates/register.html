@@ -105,6 +105,10 @@
           top: 50%;
           transform: translateY(-50%);
           color: #888;
+          font-size: 20px;
+          line-height: 1;
+          transform-origin: center;
+          transform: translateY(-50%) rotate(0deg);
         }
 
         ::placeholder {
@@ -186,14 +190,13 @@
 <body>
 <main class="login-wrapper">
     <section class="login-info">
-        <h1>BookLab</h1>
+        <h1>Lectio</h1>
         <p>Únete a nuestra biblioteca virtual. Empieza tu viaje hoy.</p>
     </section>
 
     <section class="login-form">
         <div class="container">
             <div class="top-header">
-
                 <header>Registro</header>
             </div>
 
@@ -234,14 +237,40 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const registerForm = document.getElementById('registerForm');
+      const registerForm = document.getElementById('registroForm');
       const usernameInput = document.getElementById('username');
       const emailInput = document.getElementById('email');
       const passwordInput = document.getElementById('password');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
       const usernameError = document.getElementById('usernameError');
       const emailError = document.getElementById('emailError');
       const passwordError = document.getElementById('passwordError');
+      const confirmPasswordError = document.getElementById('confirmPasswordError');
       const alertBox = document.getElementById('alertBox');
+
+      // Mostrar alertas enviadas desde el backend por parámetros GET
+      function showAlert(message, type) {
+        alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        setTimeout(() => alertBox.innerHTML = '', 5000);
+      }
+
+      // Lee el parámetro 'error' de la URL para mostrarlo como alerta
+      function getQueryParam(param) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(param);
+      }
+
+      const errorMessage = getQueryParam('error');
+      if (errorMessage) {
+        showAlert(errorMessage, 'error');
+        // Reiniciar formulario tras mostrar error
+        registerForm.reset();
+        // Limpiar parámetros de URL para evitar re-mostrar mensaje
+        if (window.history.replaceState) {
+          const url = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({path:url}, '', url);
+        }
+      }
 
       registerForm.addEventListener('submit', (e) => {
         let isValid = true;
@@ -253,10 +282,10 @@
           usernameError.style.display = 'none';
         }
 
-        if (emailInput.value.trim() === '') {
+        if (emailInput && emailInput.value.trim() === '') {
           emailError.style.display = 'block';
           isValid = false;
-        } else {
+        } else if (emailError) {
           emailError.style.display = 'none';
         }
 
@@ -267,16 +296,24 @@
           passwordError.style.display = 'none';
         }
 
+        // Validar que la confirmación de contraseña sea igual a la contraseña
+        if (confirmPasswordInput.value.trim() === '') {
+          confirmPasswordError.textContent = 'Por favor confirme su contraseña';
+          confirmPasswordError.style.display = 'block';
+          isValid = false;
+        } else if (passwordInput.value !== confirmPasswordInput.value) {
+          confirmPasswordError.textContent = 'Las contraseñas no coinciden';
+          confirmPasswordError.style.display = 'block';
+          isValid = false;
+        } else {
+          confirmPasswordError.style.display = 'none';
+        }
+
         if (!isValid) {
           e.preventDefault();
-          showAlert('Por favor complete todos los campos', 'error');
+          showAlert('Por favor corrija los errores en el formulario', 'error');
         }
       });
-
-      function showAlert(message, type) {
-        alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-        setTimeout(() => alertBox.innerHTML = '', 5000);
-      }
     });
 </script>
 </body>

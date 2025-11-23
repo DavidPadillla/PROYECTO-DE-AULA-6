@@ -2,6 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reserva de Libros - BookLab Biblioteca</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
@@ -70,74 +71,219 @@
             margin:0 auto;
         }
 
-        /* Filtros y buscador */
+        /* Filtros y buscador MEJORADOS */
         .filtros-buscador {
             display:flex;
             flex-wrap:wrap;
             gap:1rem;
-            margin-bottom:2rem;
+            margin-bottom:2.5rem;
+            padding: 1.5rem;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
         }
         .filtros-buscador select,
         .filtros-buscador input {
-            padding:0.8rem 1rem;
-            border:1px solid #ddd;
-            border-radius:8px;
+            padding:0.9rem 1.2rem;
+            border:2px solid #e8ecf1;
+            border-radius:10px;
             font-size:1rem;
             flex:1;
-            transition:border-color 0.3s;
+            transition:all 0.3s ease;
+            background: #fafbfc;
         }
         .filtros-buscador select:focus,
-        .filtros-buscador input:focus { border-color:#27ae60; outline:none; }
+        .filtros-buscador input:focus {
+            border-color:#27ae60;
+            outline:none;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
 
         /* Lista de libros */
         .lista-libros {
             display:grid;
-            grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
-            gap:1rem;
+            grid-template-columns:repeat(auto-fill, minmax(240px,1fr));
+            gap:1.5rem;
+            min-height: 400px;
         }
+
+        /* TARJETAS MEJORADAS con efectos modernos */
         .libro-item {
             background:#fff;
-            padding:1rem;
-            border-radius:12px;
-            box-shadow:0 4px 10px rgba(0,0,0,0.1);
-            transition:transform 0.3s;
+            padding:1.2rem;
+            border-radius:16px;
+            box-shadow:0 2px 12px rgba(0,0,0,0.08);
+            transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position:relative;
+            padding-top: 2.8rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
-        .libro-item:hover { transform:translateY(-5px); }
-        .libro-item h3 { font-size:1.1rem; margin-bottom:0.5rem; }
-        .libro-item p { font-size:0.9rem; margin-bottom:0.3rem; color:#7f8c8d; }
 
-        /* Badge de stock */
+        .libro-item:hover {
+            transform:translateY(-8px) scale(1.02);
+            box-shadow:0 12px 28px rgba(0,0,0,0.15);
+            border-color: rgba(39, 174, 96, 0.3);
+        }
+
+        /* Contenedor del contenido que crece */
+        .libro-contenido {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .libro-item h3 {
+            font-size:1.15rem;
+            margin-bottom:0.6rem;
+            margin-top: 0.3rem;
+            color: #1a1a1a;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .libro-item p {
+            font-size:0.88rem;
+            margin-bottom:0.4rem;
+            color:#6c757d;
+            line-height: 1.5;
+        }
+
+        .libro-item p strong {
+            color: #495057;
+            font-weight: 600;
+        }
+
+        /* Badge minimalista MEJORADO */
         .stock-badge {
-            position:absolute;
-            top:12px;
-            right:12px;
-            background:#2c3e50;
-            color:#fff;
-            padding:6px 10px;
-            border-radius:20px;
-            font-weight:600;
-            font-size:0.85rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 16px 0 16px 0;
+            font-weight: 700;
+            font-size: 0.7rem;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+            letter-spacing: 0.5px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            max-width: 55%;
+            text-transform: uppercase;
         }
-        .stock-badge.agotado { background:#e74c3c; }
 
+        .stock-badge::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 10px solid rgba(102, 126, 234, 0.5);
+            border-bottom: 10px solid transparent;
+        }
+
+        .stock-badge.agotado {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.35);
+        }
+
+        .stock-badge.agotado::after {
+            border-left-color: rgba(255, 107, 107, 0.5);
+        }
+
+        .stock-badge.bajo-stock {
+            background: linear-gradient(135deg, #ffa94d 0%, #ff8b3d 100%);
+            box-shadow: 0 4px 12px rgba(255, 169, 77, 0.35);
+        }
+
+        .stock-badge.bajo-stock::after {
+            border-left-color: rgba(255, 169, 77, 0.5);
+        }
+
+        /* Indicador de puntos animado */
+        .stock-badge .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            animation: pulse 2s ease-in-out infinite;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.3);
+            }
+        }
+
+        /* Botón mejorado con gradiente y hover suave */
         .btn-seleccionar {
             width:100%;
-            padding:0.5rem;
-            border-radius:30px;
-            background:#27ae60;
+            padding:0.7rem;
+            border-radius:12px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
             color:#fff;
             border:none;
             cursor:pointer;
-            transition:0.3s;
-        }
-        .btn-seleccionar:hover { background:#219150; }
-        .btn-seleccionar:disabled {
-            background:#bdc3c7;
-            cursor:not-allowed;
+            transition:all 0.3s ease;
+            font-weight: 600;
+            margin-top: auto;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Formulario flotante */
+        .btn-seleccionar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-seleccionar:hover::before {
+            left: 100%;
+        }
+
+        .btn-seleccionar:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.35);
+        }
+
+        .btn-seleccionar:active {
+            transform: translateY(0);
+        }
+
+        .btn-seleccionar:disabled {
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+            cursor:not-allowed;
+            box-shadow: none;
+        }
+
+        /* Formulario flotante MEJORADO */
         #formulario-reserva {
             display:none;
             position:fixed;
@@ -145,66 +291,155 @@
             left:50%;
             transform:translate(-50%, -50%);
             width:90%;
-            max-width:420px;
+            max-width:440px;
             background:#fff;
-            padding:1.5rem;
-            border-radius:12px;
-            box-shadow:0 8px 20px rgba(0,0,0,0.2);
+            padding:2rem;
+            border-radius:20px;
+            box-shadow:0 10px 40px rgba(0,0,0,0.25);
             z-index:999;
+            animation: fadeInScale 0.3s ease;
         }
-        #formulario-reserva h2 { text-align:center; margin-bottom:1rem; }
-        .form-grupo { margin-bottom:1rem; }
-        .form-grupo label { display:block; margin-bottom:0.3rem; font-weight:500; }
-        .form-grupo input { width:100%; padding:0.7rem 1rem; border:1px solid #ddd; border-radius:8px; }
-        .form-grupo input:focus { border-color:#27ae60; outline:none; }
-        .btn-confirmar { width:100%; padding:0.7rem; border-radius:30px; background:#27ae60; color:#fff; border:none; cursor:pointer; margin-top:0.5rem; }
-        .btn-confirmar:hover { background:#219150; }
-        #cancelar-reserva { width:100%; padding:0.7rem; border-radius:30px; background:#e74c3c; color:#fff; border:none; cursor:pointer; margin-top:0.5rem; }
-        #cancelar-reserva:hover { background:#c0392b; }
 
-        /* Mensaje flotante */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        #formulario-reserva h2 {
+            text-align:center;
+            margin-bottom:1.5rem;
+            color: #2c3e50;
+            font-size: 1.5rem;
+        }
+        .form-grupo { margin-bottom:1.2rem; }
+        .form-grupo label {
+            display:block;
+            margin-bottom:0.5rem;
+            font-weight:600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+        .form-grupo input {
+            width:100%;
+            padding:0.8rem 1rem;
+            border:2px solid #e8ecf1;
+            border-radius:10px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        .form-grupo input:focus {
+            border-color:#27ae60;
+            outline:none;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+        .btn-confirmar {
+            width:100%;
+            padding:0.85rem;
+            border-radius:12px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color:#fff;
+            border:none;
+            cursor:pointer;
+            margin-top:0.8rem;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
+            transition: all 0.3s ease;
+        }
+        .btn-confirmar:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.35);
+        }
+        #cancelar-reserva {
+            width:100%;
+            padding:0.85rem;
+            border-radius:12px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color:#fff;
+            border:none;
+            cursor:pointer;
+            margin-top:0.8rem;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
+            transition: all 0.3s ease;
+        }
+        #cancelar-reserva:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
+        }
+
+        /* Mensaje flotante MEJORADO */
         #mensaje-reserva {
             display:none;
             position:fixed;
             top:20px;
             right:20px;
-            background-color:#4CAF50;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             color:white;
-            padding:15px 25px;
-            border-radius:8px;
-            box-shadow:0 0 10px rgba(0,0,0,0.3);
+            padding:16px 28px;
+            border-radius:12px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.2);
             z-index:1000;
+            font-weight: 600;
+            animation: slideInBounce 0.5s ease;
         }
 
-        /* Paginación */
+        @keyframes slideInBounce {
+            0% {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            60% {
+                transform: translateX(-20px);
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Paginación MEJORADA */
         .pagination {
             display:flex;
             justify-content:center;
             align-items:center;
-            gap:10px;
-            margin:30px 0;
+            gap:12px;
+            margin:40px 0;
             flex-wrap:wrap;
         }
 
         .pagination button {
-            padding:8px 15px;
+            padding:10px 18px;
             border:none;
-            border-radius:50px;
-            background:#27ae60;
+            border-radius:10px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
             color:#fff;
             font-weight:600;
             cursor:pointer;
-            transition:all 0.3s;
+            transition:all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.2);
+            min-width: 45px;
         }
 
         .pagination button:hover {
-            background:#219150;
-            transform:translateY(-2px);
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform:translateY(-3px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
         }
 
         .pagination button.disabled {
-            background:#bdc3c7;
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
             cursor:not-allowed;
+            box-shadow: none;
         }
 
         /* Buscador de páginas */
@@ -212,38 +447,48 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin: 15px 0;
+            gap: 12px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
 
+        .page-jumper span {
+            font-weight: 600;
+            color: #495057;
+        }
+
         .page-jumper input {
-            width: 60px;
-            padding: 8px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
+            width: 70px;
+            padding: 10px 14px;
+            border: 2px solid #e8ecf1;
+            border-radius: 10px;
             text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .page-jumper input:focus {
             outline: none;
             border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
         }
 
         .page-jumper button {
-            padding: 8px 15px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 50px;
-            background: #2c3e50;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
             color: #fff;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
         }
 
         .page-jumper button:hover {
-            background: #1a252f;
+            background: linear-gradient(135deg, #1a252f 0%, #0d1419 100%);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
         }
 
         /* Modal de error */
@@ -270,11 +515,11 @@
 
         .page-error-content {
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 90%;
             transform: scale(0.8);
             transition: transform 0.3s ease;
@@ -285,47 +530,81 @@
         }
 
         .page-error-icon {
-            font-size: 3rem;
-            color: #e74c3c;
-            margin-bottom: 15px;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
         }
 
         .page-error-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.6rem;
+            font-weight: 700;
             color: #2c3e50;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .page-error-message {
-            font-size: 1rem;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-            line-height: 1.5;
+            font-size: 1.05rem;
+            color: #6c757d;
+            margin-bottom: 25px;
+            line-height: 1.6;
         }
 
         .page-error-close {
-            padding: 10px 25px;
-            background: #27ae60;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
             color: white;
             border: none;
-            border-radius: 50px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.25);
         }
 
         .page-error-close:hover {
-            background: #219150;
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.35);
+        }
+
+        /* Loader inicial */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #27ae60;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loader p {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         footer {
-            background:#2c3e50;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
             color:#fff;
             text-align:center;
-            padding:1.5rem;
-            margin-top:2rem;
+            padding:2rem;
+            margin-top:3rem;
             font-size:0.9rem;
         }
 
@@ -346,14 +625,13 @@
             }
 
             .lista-libros {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 0.8rem;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1.2rem;
             }
         }
 
         /* Móviles (hasta 768px) */
         @media (max-width: 768px) {
-            /* Header y navegación móvil */
             header {
                 padding: 0;
             }
@@ -413,9 +691,9 @@
                 margin: 0;
             }
 
-            /* Búsqueda y filtros móviles */
             .filtros-buscador {
                 flex-direction:column;
+                padding: 1.2rem;
             }
 
             .filtros-buscador select,
@@ -423,37 +701,44 @@
                 width: 100%;
             }
 
-            /* Lista de libros móvil */
             .lista-libros {
                 grid-template-columns:1fr;
+                gap: 1rem;
             }
 
             .libro-item {
-                padding: 0.8rem;
+                padding: 1rem;
+                padding-top: 2.8rem;
+                min-height: 280px;
             }
 
             .libro-item h3 {
-                font-size: 1rem;
+                font-size: 1.05rem;
             }
 
             .libro-item p {
                 font-size: 0.85rem;
             }
 
-            /* Paginación móvil */
+            .stock-badge {
+                font-size: 0.65rem;
+                padding: 6px 12px;
+                max-width: 60%;
+            }
+
             .pagination {
-                gap: 5px;
-                margin: 20px 0;
+                gap: 8px;
+                margin: 30px 0;
             }
 
             .pagination button {
-                padding: 6px 12px;
+                padding: 8px 14px;
                 font-size: 0.9rem;
             }
 
             .page-jumper {
                 flex-direction: column;
-                gap: 8px;
+                gap: 10px;
             }
 
             .page-jumper input {
@@ -476,32 +761,44 @@
             }
 
             .libro-item {
-                padding: 0.7rem;
+                padding: 0.9rem;
+                padding-top: 2.6rem;
+                min-height: 260px;
             }
 
             .btn-seleccionar {
-                padding: 0.4rem;
+                padding: 0.65rem;
                 font-size: 0.9rem;
             }
 
             #formulario-reserva {
                 width: 95%;
-                padding: 1rem;
+                padding: 1.5rem;
             }
 
             .form-grupo input {
-                padding: 0.6rem 0.8rem;
+                padding: 0.7rem 0.9rem;
+            }
+
+            .stock-badge {
+                font-size: 0.6rem;
+                padding: 5px 10px;
             }
         }
     </style>
 </head>
 <body>
 
+<!-- Loader inicial -->
+<div id="loader">
+    <div class="spinner"></div>
+    <p>Cargando libros...</p>
+</div>
+
 <header>
     <nav>
         <div class="logo"><h1>Lectio <span>Biblioteca</span></h1></div>
 
-        <!-- Menú hamburguesa para móviles -->
         <button class="menu-toggle" aria-label="Abrir menú de navegación">
             <i class="fas fa-bars"></i>
         </button>
@@ -531,7 +828,7 @@
     <div class="pagination" id="pagination"></div>
 
     <!-- Buscador de páginas -->
-    <div class="page-jumper" id="pageJumper">
+    <div class="page-jumper" id="pageJumper" style="display: none;">
         <span>Ir a la página:</span>
         <input type="number" id="pageInput" min="1" value="1">
         <button id="goToPageBtn">Ir</button>
@@ -590,15 +887,16 @@
     $(document).ready(function(){
 
         let todosLosLibros = [];
-        const itemsPerPage = 8; // Menos elementos por página para mejor visualización en móviles
+        const itemsPerPage = 8;
         let currentPage = 1;
         let filteredBooks = [];
         let totalPages = 0;
         let currentCategoria = null;
+        let isInitialLoad = true;
         const hoy = new Date().toISOString().split('T')[0];
         $('#fecha').attr('min', hoy);
 
-        // ===== FUNCIÓN PARA MENÚ MÓVIL =====
+        // ===== MENÚ MÓVIL =====
         const menuToggle = $('.menu-toggle');
         const navLinks = $('.nav-links');
         const navOverlay = $('.nav-overlay');
@@ -609,7 +907,6 @@
                 navOverlay.toggleClass('active');
                 $('body').css('overflow', navLinks.hasClass('active') ? 'hidden' : '');
 
-                // Cambiar icono del menú
                 const icon = $(this).find('i');
                 if (navLinks.hasClass('active')) {
                     icon.removeClass('fa-bars').addClass('fa-times');
@@ -618,73 +915,68 @@
                 }
             });
 
-            // Cerrar menú al hacer clic en el overlay
             navOverlay.on('click', function() {
                 navLinks.removeClass('active');
                 $(this).removeClass('active');
                 $('body').css('overflow', '');
 
-                // Restaurar icono del menú
                 const icon = menuToggle.find('i');
                 icon.removeClass('fa-times').addClass('fa-bars');
             });
 
-            // Cerrar menú al hacer clic en un enlace (en móviles)
             $('.nav-links a').on('click', function() {
                 if (window.innerWidth <= 768) {
                     navLinks.removeClass('active');
                     navOverlay.removeClass('active');
                     $('body').css('overflow', '');
 
-                    // Restaurar icono del menú
                     const icon = menuToggle.find('i');
                     icon.removeClass('fa-times').addClass('fa-bars');
                 }
             });
         }
 
-        // Función para cargar libros
         function loadBooks(categoria) {
             currentCategoria = categoria || null;
-            if(categoria) {
-                $.ajax({
-                    url:'/api/cargarLibrosPorCategoria',
-                    type:'GET',
-                    data:{categoria:categoria},
-                    success:function(data){
-                        todosLosLibros = data;
-                        filteredBooks = data;
-                        currentPage = 1;
-                        mostrarLibrosPaginados();
-                        renderPagination();
-                    },
-                    error:function(){
-                        mostrarMensaje('Error al cargar los libros', 'error');
-                    }
-                });
-            } else {
-                // Cargar todos los libros
-                $.ajax({
-                    url:'/api/cargarTodosLosLibros',
-                    type:'GET',
-                    success:function(data){
-                        todosLosLibros = data;
-                        filteredBooks = data;
-                        currentPage = 1;
-                        mostrarLibrosPaginados();
-                        renderPagination();
-                    },
-                    error:function(){
-                        mostrarMensaje('Error al cargar los libros', 'error');
-                    }
-                });
+
+            if (!isInitialLoad) {
+                $('#loader').fadeIn();
             }
+
+            const url = categoria ? '/api/cargarLibrosPorCategoria' : '/api/cargarTodosLosLibros';
+            const data = categoria ? {categoria: categoria} : {};
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: data,
+                success: function(data){
+                    todosLosLibros = data;
+                    filteredBooks = data;
+                    currentPage = 1;
+                    mostrarLibrosPaginados();
+                    renderPagination();
+
+                    $('#loader').fadeOut();
+
+                    if (isInitialLoad) {
+                        isInitialLoad = false;
+                    }
+                },
+                error: function(){
+                    $('#loader').fadeOut();
+
+                    if (!isInitialLoad) {
+                        mostrarMensaje('Error al cargar los libros', 'error');
+                    } else {
+                        isInitialLoad = false;
+                    }
+                }
+            });
         }
 
-        // Inicial: cargar todos los libros
         loadBooks();
 
-        // Cargar libros por categoría
         $('#categoria').change(function(){
             const categoria = $(this).val();
             $('#categoria-seleccionada').val(categoria);
@@ -697,7 +989,6 @@
             }
         });
 
-        // Filtrar libros
         $('#busqueda').keyup(function(){
             const term = $(this).val().toLowerCase();
             filteredBooks = todosLosLibros.filter(libro =>
@@ -718,19 +1009,29 @@
             $lista.empty();
 
             if (filteredBooks.length === 0) {
-                $lista.html('<p>No se encontraron libros</p>');
+                $lista.html('<p style="text-align: center; padding: 2rem; color: #7f8c8d;">No se encontraron libros</p>');
                 return;
             }
 
             librosPagina.forEach(libro => {
-                // Asegurar propiedades
                 const stock = (typeof libro.stock === 'number') ? libro.stock : 0;
                 const tituloEsc = escapeHtml(libro.titulo || '');
                 const autorEsc = escapeHtml(libro.autor || '');
                 const categoriaEsc = escapeHtml(libro.categoria || '');
                 const id = libro.id || libro._id || '';
 
-                const stockBadge = stock > 0 ? `<div class="stock-badge">${stock}</div>` : `<div class="stock-badge agotado">Agotado</div>`;
+                let stockClass = '';
+                let stockText = '';
+
+                if (stock === 0) {
+                    stockClass = 'agotado';
+                    stockText = 'Agotado';
+                } else if (stock <= 3) {
+                    stockClass = 'bajo-stock';
+                    stockText = `Stock: ${stock}`;
+                } else {
+                    stockText = `Stock: ${stock}`;
+                }
 
                 const reservarBtn = stock > 0
                     ? `<button class="btn-seleccionar btn-reservar" data-id="${id}" data-titulo="${tituloEsc}" data-categoria="${categoriaEsc}">Reservar</button>`
@@ -738,18 +1039,21 @@
 
                 const itemHtml = `
                     <div class="libro-item" data-id="${id}">
-                        ${stockBadge}
-                        <h3>${tituloEsc}</h3>
-                        ${autorEsc ? `<p><strong>Autor:</strong> ${autorEsc}</p>` : ''}
-                        ${categoriaEsc ? `<p><strong>Categoría:</strong> ${categoriaEsc}</p>` : ''}
-                        <p><strong>Stock:</strong> <span class="stock-value">${stock > 0 ? stock : '0'}</span></p>
+                        <div class="stock-badge ${stockClass}">
+                            <span class="dot"></span>
+                            ${stockText}
+                        </div>
+                        <div class="libro-contenido">
+                            <h3>${tituloEsc}</h3>
+                            ${autorEsc ? `<p><strong>Autor:</strong> ${autorEsc}</p>` : ''}
+                            ${categoriaEsc ? `<p><strong>Categoría:</strong> ${categoriaEsc}</p>` : ''}
+                        </div>
                         ${reservarBtn}
                     </div>
                 `;
                 $lista.append(itemHtml);
             });
 
-            // Asignar eventos a los botones de reserva
             $('.btn-reservar').off('click').on('click', function(){
                 const id = $(this).data('id');
                 const titulo = $(this).data('titulo');
@@ -775,7 +1079,6 @@
 
             $('#pageJumper').show();
 
-            // Botón anterior
             const prevBtn = $('<button>').text('←');
             if (currentPage === 1) {
                 prevBtn.addClass('disabled').prop('disabled', true);
@@ -785,15 +1088,14 @@
                     currentPage--;
                     mostrarLibrosPaginados();
                     renderPagination();
+                    $('#pageInput').val(currentPage);
                 }
             });
             $pagination.append(prevBtn);
 
-            // Solo mostrar 3 números de página
             let startPage = Math.max(1, currentPage - 1);
             let endPage = Math.min(totalPages, startPage + 2);
 
-            // Ajustar si estamos cerca del final
             if (endPage - startPage < 2) {
                 startPage = Math.max(1, endPage - 2);
             }
@@ -807,11 +1109,11 @@
                     currentPage = i;
                     mostrarLibrosPaginados();
                     renderPagination();
+                    $('#pageInput').val(currentPage);
                 });
                 $pagination.append(btn);
             }
 
-            // Botón siguiente
             const nextBtn = $('<button>').text('→');
             if (currentPage === totalPages) {
                 nextBtn.addClass('disabled').prop('disabled', true);
@@ -821,12 +1123,14 @@
                     currentPage++;
                     mostrarLibrosPaginados();
                     renderPagination();
+                    $('#pageInput').val(currentPage);
                 }
             });
             $pagination.append(nextBtn);
+
+            $('#pageInput').val(currentPage);
         }
 
-        // Función para ir a página específica
         $('#goToPageBtn').on('click', goToPage);
         $('#pageInput').on('keyup', function(e) {
             if (e.key === 'Enter') goToPage();
@@ -844,29 +1148,21 @@
         }
 
         function showPageError(requestedPage) {
-            // Actualizar el mensaje con el número total de páginas disponibles
             $('#pageErrorMessage').text(`Solo tenemos ${totalPages} página${totalPages !== 1 ? 's' : ''} disponible${totalPages !== 1 ? 's' : ''}. Por favor, ingresa un número entre 1 y ${totalPages}.`);
-
-            // Mostrar el modal
             $('#pageErrorModal').addClass('active');
-
-            // Actualizar el valor del input con la página actual
             $('#pageInput').val(currentPage);
         }
 
-        // Cerrar el modal de error
         $('#pageErrorClose').on('click', function() {
             $('#pageErrorModal').removeClass('active');
         });
 
-        // Cerrar el modal al hacer clic fuera del contenido
         $('#pageErrorModal').on('click', function(e) {
             if (e.target === this) {
                 $(this).removeClass('active');
             }
         });
 
-        // Cerrar el modal con la tecla Escape
         $(document).on('keydown', function(e) {
             if (e.key === 'Escape' && $('#pageErrorModal').hasClass('active')) {
                 $('#pageErrorModal').removeClass('active');
@@ -878,7 +1174,6 @@
             $('#reserva-form')[0].reset();
         });
 
-        // Guardar reserva con control de stock
         $('#reserva-form').submit(function(e){
             e.preventDefault();
             const libroId = $('#libro-id').val();
@@ -894,12 +1189,10 @@
                 return;
             }
 
-            // 1) Llamada para decrementar stock
             $.ajax({
                 url: '/api/reservar/' + encodeURIComponent(libroId),
                 type: 'POST'
             }).done(function(responseHtml){
-                // 2) Guardar la reserva del usuario en el backend
                 $.ajax({
                     url: '/api/guardarReservaUsuario',
                     type: 'POST',
@@ -915,10 +1208,8 @@
                     mostrarMensaje('Reserva realizada con éxito', 'exito');
                     $('#formulario-reserva').fadeOut();
                     $('#reserva-form')[0].reset();
-                    // recargar libros (mantener categoría si seleccionada)
                     loadBooks(currentCategoria);
                 }).fail(function(xhr){
-                    // Si guardar reserva falla, intentar revertir stock sería ideal (no implementado).
                     let msg = 'Error al guardar la reserva';
                     if(xhr.responseText) msg = xhr.responseText;
                     mostrarMensaje(msg, 'error');
@@ -926,7 +1217,6 @@
                 });
             }).fail(function(xhr){
                 mostrarMensaje('No se pudo reservar: sin stock o error', 'error');
-                // recargar libros para mostrar estado real
                 loadBooks(currentCategoria);
             });
         });
@@ -934,14 +1224,13 @@
         function mostrarMensaje(texto, tipo){
             const $msg = $('#mensaje-reserva');
             $msg.text(texto);
-            if(tipo === 'exito') $msg.css('background-color', '#4CAF50');
-            else $msg.css('background-color', '#e74c3c');
+            if(tipo === 'exito') $msg.css('background', 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)');
+            else $msg.css('background', 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)');
             $msg.fadeIn();
 
             setTimeout(()=>{ $msg.fadeOut(); }, 3000);
         }
 
-        // Función de escape para seguridad al inyectar texto
         function escapeHtml(text){
             if(!text) return '';
             return String(text)
@@ -956,3 +1245,4 @@
 </script>
 </body>
 </html>
+
