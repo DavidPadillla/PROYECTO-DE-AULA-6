@@ -4,6 +4,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +13,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Async
     public void enviarConfirmacionReservaHTML(String destinatario, String nombreUsuario, String libro, String fecha, String categoria) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -76,8 +78,9 @@ public class EmailService {
 
             helper.setText(htmlMsg, true);
             mailSender.send(message);
+            System.out.println("✅ Email enviado exitosamente a: " + destinatario);
         } catch (Exception e) {
-            System.err.println("Error enviando email HTML: " + e.getMessage());
+            System.err.println("❌ Error enviando email HTML: " + e.getMessage());
             e.printStackTrace();
         }
     }
