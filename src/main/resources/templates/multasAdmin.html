@@ -65,6 +65,60 @@
             box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
         }
 
+        /* Alert Message */
+        .alert {
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideInDown 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .alert i {
+            font-size: 20px;
+        }
+
+        .alert-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
         /* Container */
         .container {
             max-width: 1400px;
@@ -399,6 +453,24 @@
 
 <!-- Container -->
 <div class="container">
+    <!-- Success Message -->
+    <div th:if="${mensaje}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <span th:text="${mensaje}">Multa marcada como pagada</span>
+        <button class="alert-close" onclick="this.parentElement.style.display='none'">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Error Message -->
+    <div th:if="${error}" class="alert alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span th:text="${error}">Error al procesar el pago</span>
+        <button class="alert-close" onclick="this.parentElement.style.display='none'">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <div class="page-header">
         <h1 class="page-title">Gestión de Multas</h1>
         <p class="page-subtitle">Administra y da seguimiento a las multas por retrasos en devoluciones</p>
@@ -466,7 +538,7 @@
             </div>
 
             <div th:unless="${multa.pagada}" class="multa-actions">
-                <form th:action="@{/multas/pagar/{id}(id=${multa.id})}" method="post" style="margin: 0;">
+                <form th:action="@{/api/multas/pagar/{id}(id=${multa.id})}" method="post" style="margin: 0;">
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-check"></i> Marcar como Pagada
                     </button>
@@ -491,6 +563,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
         // Filtro de búsqueda
         $("#searchInput").on("keyup", function() {
             filterMultas();
