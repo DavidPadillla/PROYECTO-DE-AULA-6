@@ -17,6 +17,15 @@ public class RespuestaDashboardPostgres {
     @Column(columnDefinition = "TEXT")
     private String id;
 
+    // ✅ NUEVO: Relación con usuarios (quién respondió la encuesta)
+    @Column(name = "id_usuario", columnDefinition = "TEXT")
+    private String idUsuario;
+
+    // ✅ NUEVO: username como backup (legible para humanos)
+    @Column(name = "username", columnDefinition = "TEXT")
+    private String username;
+
+    // Campos existentes de la encuesta
     private Integer edad;
 
     @Column(columnDefinition = "TEXT")
@@ -72,7 +81,7 @@ public class RespuestaDashboardPostgres {
     @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
-    // Constructor sin ID (genera UUID automáticamente)
+    // Constructor original (sin relación con usuario)
     public RespuestaDashboardPostgres(Integer edad, String genero, String educacion,
                                       String frecuencia, String categoriaFavorita, String formato,
                                       String uso, Integer librosMes, Integer calificacion,
@@ -80,6 +89,39 @@ public class RespuestaDashboardPostgres {
                                       String mejoras, String recomendaciones, String clubes,
                                       String compras, String autoresFavoritos, String boletines) {
         this.id = java.util.UUID.randomUUID().toString();
+        this.idUsuario = null;  // Sin relación
+        this.username = null;
+        this.edad = edad;
+        this.genero = genero;
+        this.educacion = educacion;
+        this.frecuencia = frecuencia;
+        this.categoriaFavorita = categoriaFavorita;
+        this.formato = formato;
+        this.uso = uso;
+        this.librosMes = librosMes;
+        this.calificacion = calificacion;
+        this.recomendacion = recomendacion;
+        this.dispositivos = dispositivos;
+        this.ultimoLibro = ultimoLibro;
+        this.mejoras = mejoras;
+        this.recomendaciones = recomendaciones;
+        this.clubes = clubes;
+        this.compras = compras;
+        this.autoresFavoritos = autoresFavoritos;
+        this.boletines = boletines;
+        this.fechaRegistro = LocalDateTime.now();
+    }
+
+    // ✅ NUEVO Constructor con relación a usuario
+    public RespuestaDashboardPostgres(String idUsuario, String username, Integer edad, String genero,
+                                      String educacion, String frecuencia, String categoriaFavorita,
+                                      String formato, String uso, Integer librosMes, Integer calificacion,
+                                      String recomendacion, String dispositivos, String ultimoLibro,
+                                      String mejoras, String recomendaciones, String clubes,
+                                      String compras, String autoresFavoritos, String boletines) {
+        this.id = java.util.UUID.randomUUID().toString();
+        this.idUsuario = idUsuario;
+        this.username = username;
         this.edad = edad;
         this.genero = genero;
         this.educacion = educacion;

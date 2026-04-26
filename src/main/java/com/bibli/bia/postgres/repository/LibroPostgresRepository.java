@@ -2,8 +2,8 @@ package com.bibli.bia.postgres.repository;
 
 import com.bibli.bia.postgres.entity.LibroPostgres;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
-@Repository
-public interface LibroPostgresRepository extends JpaRepository<LibroPostgres, Long> {
+public interface LibroPostgresRepository extends JpaRepository<LibroPostgres, String> {
+    Optional<LibroPostgres> findByTitulo(String titulo);
 }

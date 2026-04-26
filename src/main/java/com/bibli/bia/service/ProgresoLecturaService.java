@@ -13,7 +13,7 @@ public class ProgresoLecturaService {
     private final ProgresoLecturaRepository progresoRepository;
 
     @Autowired
-    private SyncService syncService;  // ← AGREGAR ESTO
+    private SyncService syncService;
 
     public ProgresoLecturaService(ProgresoLecturaRepository progresoRepository) {
         this.progresoRepository = progresoRepository;
@@ -27,7 +27,7 @@ public class ProgresoLecturaService {
         } else {
             ProgresoLectura nuevoProgreso = new ProgresoLectura(username);
             ProgresoLectura saved = progresoRepository.save(nuevoProgreso);
-            syncService.sincronizarProgresoLectura(saved);  // ← SINCRONIZAR
+            syncService.sincronizarProgresoLectura(saved);
             return saved;
         }
     }
@@ -52,7 +52,7 @@ public class ProgresoLecturaService {
         progreso.setUltimaActualizacion(LocalDateTime.now());
 
         ProgresoLectura saved = progresoRepository.save(progreso);
-        syncService.sincronizarProgresoLectura(saved);  // ← SINCRONIZAR
+        syncService.sincronizarProgresoLectura(saved);
         return saved;
     }
 
@@ -69,7 +69,7 @@ public class ProgresoLecturaService {
         progreso.setUltimaActualizacion(LocalDateTime.now());
 
         ProgresoLectura saved = progresoRepository.save(progreso);
-        syncService.sincronizarProgresoLectura(saved);  // ← SINCRONIZAR
+        syncService.sincronizarProgresoLectura(saved);
         return saved;
     }
 

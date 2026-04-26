@@ -14,8 +14,13 @@ public class LibroFisicoPostgres {
 
     @Id
     @Column(columnDefinition = "TEXT")
-    private String id;  // Cambiar de Long a String para coincidir con TEXT en BD
+    private String id;
 
+    // ✅ NUEVO: Relación con la tabla libros
+    @Column(name = "id_libro", columnDefinition = "TEXT")
+    private String idLibro;  // ← Foreign Key a libros(id)
+
+    // Campos existentes (se pueden mantener o migrar a la tabla libros)
     @Column(columnDefinition = "TEXT")
     private String titulo;
 
@@ -30,5 +35,4 @@ public class LibroFisicoPostgres {
 
     private int stock = 0;
     private int reservado = 0;
-
 }

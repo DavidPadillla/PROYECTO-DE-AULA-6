@@ -10,18 +10,20 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class SyncService {
 
-
-    private static final int LIMITE_REGISTROS = 10;
-
+    private static final int LIMITE_REGISTROS = 1;
 
     private static LocalDateTime ultimaSincronizacion = null;
     private static int totalSincronizados = 0;
+
+    private final Map<String, String> cacheLibroId = new HashMap<>();
 
     @Autowired
     private LibroRepository libroMongoRepo;
@@ -61,24 +63,22 @@ public class SyncService {
 
     @PostConstruct
     public void sincronizarTodo() {
-        System.out.println("✅ Iniciando sincronización MongoDB → PostgreSQL...");
-        System.out.println("📊 Limitando a " + LIMITE_REGISTROS + " registros por tabla");
+        System.out.println("Iniciando sincronizacion MongoDB → PostgreSQL...");
+        System.out.println("Limitando a " + LIMITE_REGISTROS + " registros por tabla");
 
         sincronizarLibros();
         sincronizarLibrosFisicos();
         sincronizarUsuarios();
         sincronizarReservas();
-        sincronizarResenas();
-        sincronizarProgresoLectura();
-        sincronizarMultas();
-        sincronizarDashboard();
+        sincronizarResenasBatch();
+        sincronizarProgresoLecturaBatch();
+        sincronizarMultasBatch();
+        sincronizarDashboardBatch();
 
-        // Actualizar estadísticas
         ultimaSincronizacion = LocalDateTime.now();
 
-        System.out.println("🎉 Sincronización completada!");
-        System.out.println("📊 Total de registros sincronizados: " + totalSincronizados);
-        System.out.println("📅 Última sincronización: " + ultimaSincronizacion);
+        System.out.println("Sincronizacion completada!");
+        System.out.println("Total de registros sincronizados: " + totalSincronizados);
     }
 
     private void sincronizarLibros() {
@@ -88,8 +88,14 @@ public class SyncService {
         for (LibroModel m : libroMongoRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = libroPostgresRepo.findAll().stream()
-                    .anyMatch(l -> l.getTitulo() != null && l.getTitulo().equals(m.getTitulo()));
+            boolean existe = false;
+            for (LibroPostgres l : libroPostgresRepo.findAll()) {
+                if (l.getTitulo() != null && l.getTitulo().equals(m.getTitulo())) {
+                    existe = true;
+                    cacheLibroId.put(m.getTitulo(), l.getId());
+                    break;
+                }
+            }
 
             if (!existe) {
                 LibroPostgres p = new LibroPostgres();
@@ -100,6 +106,7 @@ public class SyncService {
                 p.setDescripcion(m.getDescripcion());
                 p.setCategoria(m.getCategoria());
                 list.add(p);
+                cacheLibroId.put(m.getTitulo(), p.getId());
                 count++;
             }
         }
@@ -108,7 +115,7 @@ public class SyncService {
             libroPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("📚 Sincronizados " + list.size() + " libros nuevos (máximo " + LIMITE_REGISTROS + ")");
+        System.out.println("Libros sincronizados: " + list.size());
     }
 
     private void sincronizarLibrosFisicos() {
@@ -118,12 +125,18 @@ public class SyncService {
         for (LibroFisicoModel m : libroFisicoRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = libroFisicoPostgresRepo.findAll().stream()
-                    .anyMatch(l -> l.getTitulo() != null && l.getTitulo().equals(m.getTitulo()));
+            boolean existe = false;
+            for (LibroFisicoPostgres l : libroFisicoPostgresRepo.findAll()) {
+                if (l.getTitulo() != null && l.getTitulo().equals(m.getTitulo())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
                 LibroFisicoPostgres p = new LibroFisicoPostgres();
                 p.setId(UUID.randomUUID().toString());
+                p.setIdLibro(cacheLibroId.get(m.getTitulo()));
                 p.setTitulo(m.getTitulo());
                 p.setAutor(m.getAutor());
                 p.setDescripcion(m.getDescripcion());
@@ -139,7 +152,7 @@ public class SyncService {
             libroFisicoPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("📖 Sincronizados " + list.size() + " libros físicos nuevos");
+        System.out.println("Libros fisicos sincronizados: " + list.size());
     }
 
     private void sincronizarUsuarios() {
@@ -149,8 +162,13 @@ public class SyncService {
         for (Usuario m : usuarioRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = usuarioPostgresRepo.findAll().stream()
-                    .anyMatch(u -> u.getUsername() != null && u.getUsername().equals(m.getUsername()));
+            boolean existe = false;
+            for (UsuarioPostgres u : usuarioPostgresRepo.findAll()) {
+                if (u.getUsername() != null && u.getUsername().equals(m.getUsername())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
                 UsuarioPostgres p = new UsuarioPostgres();
@@ -171,7 +189,7 @@ public class SyncService {
             usuarioPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("👤 Sincronizados " + list.size() + " usuarios nuevos");
+        System.out.println("Usuarios sincronizados: " + list.size());
     }
 
     private void sincronizarReservas() {
@@ -181,19 +199,29 @@ public class SyncService {
         for (ReservaModel m : reservaRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = reservaPostgresRepo.findAll().stream()
-                    .anyMatch(r -> r.getIdUsuario() != null && r.getIdUsuario().equals(m.getIdUsuario())
-                            && r.getLibro() != null && r.getLibro().equals(m.getLibro()));
+            String idLibro = cacheLibroId.get(m.getLibro());
+
+            boolean existe = false;
+            for (ReservaPostgres r : reservaPostgresRepo.findAll()) {
+                if (r.getIdUsuario() != null && r.getIdUsuario().equals(m.getIdUsuario())
+                        && r.getLibro() != null && r.getLibro().equals(m.getLibro())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
-                ReservaPostgres p = new ReservaPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setIdUsuario(m.getIdUsuario());
-                p.setNombreCompleto(m.getNombreCompleto());
-                p.setCorreo(m.getCorreo());
-                p.setCategoria(m.getCategoria());
-                p.setLibro(m.getLibro());
-                p.setFecha(m.getFecha());
+                ReservaPostgres p = new ReservaPostgres(
+                        m.getIdUsuario(),
+                        m.getNombreCompleto(),
+                        m.getCorreo(),
+                        m.getCategoria(),
+                        m.getLibro(),
+                        m.getFecha()
+                );
+                if (idLibro != null) {
+                    p.setIdLibro(idLibro);
+                }
                 list.add(p);
                 count++;
             }
@@ -203,25 +231,27 @@ public class SyncService {
             reservaPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("📅 Sincronizados " + list.size() + " reservas nuevas");
+        System.out.println("Reservas sincronizadas: " + list.size());
     }
 
-    private void sincronizarResenas() {
+    private void sincronizarResenasBatch() {
         List<ResenaPostgres> list = new ArrayList<>();
         int count = 0;
 
         for (ResenaModel m : resenaRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = resenaPostgresRepo.findAll().stream()
-                    .anyMatch(r -> r.getNombre() != null && r.getNombre().equals(m.getNombre())
-                            && r.getComentario() != null && r.getComentario().equals(m.getComentario()));
+            boolean existe = false;
+            for (ResenaPostgres r : resenaPostgresRepo.findAll()) {
+                if (r.getNombre() != null && r.getNombre().equals(m.getNombre())
+                        && r.getComentario() != null && r.getComentario().equals(m.getComentario())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
-                ResenaPostgres p = new ResenaPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setNombre(m.getNombre());
-                p.setComentario(m.getComentario());
+                ResenaPostgres p = new ResenaPostgres(m.getNombre(), m.getComentario());
                 list.add(p);
                 count++;
             }
@@ -231,23 +261,26 @@ public class SyncService {
             resenaPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("⭐ Sincronizadas " + list.size() + " reseñas nuevas");
+        System.out.println("Resenas sincronizadas: " + list.size());
     }
 
-    private void sincronizarProgresoLectura() {
+    private void sincronizarProgresoLecturaBatch() {
         List<ProgresoLecturaPostgres> list = new ArrayList<>();
         int count = 0;
 
         for (ProgresoLectura m : progresoRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = progresoPostgresRepo.findAll().stream()
-                    .anyMatch(p -> p.getUsername() != null && p.getUsername().equals(m.getUsername()));
+            boolean existe = false;
+            for (ProgresoLecturaPostgres p : progresoPostgresRepo.findAll()) {
+                if (p.getUsername() != null && p.getUsername().equals(m.getUsername())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
-                ProgresoLecturaPostgres p = new ProgresoLecturaPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setUsername(m.getUsername());
+                ProgresoLecturaPostgres p = new ProgresoLecturaPostgres(m.getUsername());
                 p.setTotalLibrosLeidos(m.getTotalLibrosLeidos());
                 p.setUltimaActualizacion(m.getUltimaActualizacion());
                 p.setPuntos(m.getPuntos());
@@ -267,23 +300,28 @@ public class SyncService {
             progresoPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("📊 Sincronizados " + list.size() + " progresos de lectura nuevos");
+        System.out.println("Progresos lectura sincronizados: " + list.size());
     }
 
-    // ✅ CORREGIDO: No asignar ID manualmente, usar constructor
-    private void sincronizarMultas() {
+    private void sincronizarMultasBatch() {
         List<MultaPostgres> list = new ArrayList<>();
         int count = 0;
 
         for (MultaModel m : multaRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = multaPostgresRepo.findAll().stream()
-                    .anyMatch(mt -> mt.getIdUsuario() != null && mt.getIdUsuario().equals(m.getIdUsuario())
-                            && mt.getLibro() != null && mt.getLibro().equals(m.getLibro()));
+            String idLibro = cacheLibroId.get(m.getLibro());
+
+            boolean existe = false;
+            for (MultaPostgres mt : multaPostgresRepo.findAll()) {
+                if (mt.getIdUsuario() != null && mt.getIdUsuario().equals(m.getIdUsuario())
+                        && mt.getLibro() != null && mt.getLibro().equals(m.getLibro())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
-                // ✅ Usar el constructor sin ID (PostgreSQL lo genera automáticamente)
                 MultaPostgres p = new MultaPostgres(
                         m.getIdUsuario(),
                         m.getNombreUsuario(),
@@ -293,7 +331,10 @@ public class SyncService {
                         m.getDiasRetraso(),
                         m.getValorMulta()
                 );
-
+                if (idLibro != null) {
+                    p.setIdLibro(idLibro);
+                    p.setLibroTitulo(m.getLibro());
+                }
                 p.setPagada(m.isPagada());
                 p.setFechaPago(m.getFechaPago());
                 list.add(p);
@@ -305,42 +346,46 @@ public class SyncService {
             multaPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("💰 Sincronizadas " + list.size() + " multas nuevas");
+        System.out.println("Multas sincronizadas: " + list.size());
     }
 
-    private void sincronizarDashboard() {
+    private void sincronizarDashboardBatch() {
         List<RespuestaDashboardPostgres> list = new ArrayList<>();
         int count = 0;
 
         for (RespuestaDashboard m : dashboardRepo.findAll()) {
             if (count >= LIMITE_REGISTROS) break;
 
-            boolean existe = dashboardPostgresRepo.findAll().stream()
-                    .anyMatch(d -> d.getGenero() != null && d.getGenero().equals(m.getGenero())
-                            && d.getEdad() != null && d.getEdad().equals(m.getEdad()));
+            boolean existe = false;
+            for (RespuestaDashboardPostgres d : dashboardPostgresRepo.findAll()) {
+                if (d.getGenero() != null && d.getGenero().equals(m.getGenero())
+                        && d.getEdad() != null && d.getEdad().equals(m.getEdad())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
-                RespuestaDashboardPostgres p = new RespuestaDashboardPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setEdad(m.getEdad());
-                p.setGenero(m.getGenero());
-                p.setEducacion(m.getEducacion());
-                p.setFrecuencia(m.getFrecuencia());
-                p.setCategoriaFavorita(m.getCategoriaFavorita());
-                p.setFormato(m.getFormato());
-                p.setUso(m.getUso());
-                p.setLibrosMes(m.getLibrosMes());
-                p.setCalificacion(m.getCalificacion());
-                p.setRecomendacion(m.getRecomendacion());
-                p.setDispositivos(m.getDispositivos());
-                p.setUltimoLibro(m.getUltimoLibro());
-                p.setMejoras(m.getMejoras());
-                p.setRecomendaciones(m.getRecomendaciones());
-                p.setClubes(m.getClubes());
-                p.setCompras(m.getCompras());
-                p.setAutoresFavoritos(m.getAutoresFavoritos());
-                p.setBoletines(m.getBoletines());
-                p.setFechaRegistro(m.getFechaRegistro());
+                RespuestaDashboardPostgres p = new RespuestaDashboardPostgres(
+                        m.getEdad(),
+                        m.getGenero(),
+                        m.getEducacion(),
+                        m.getFrecuencia(),
+                        m.getCategoriaFavorita(),
+                        m.getFormato(),
+                        m.getUso(),
+                        m.getLibrosMes(),
+                        m.getCalificacion(),
+                        m.getRecomendacion(),
+                        m.getDispositivos(),
+                        m.getUltimoLibro(),
+                        m.getMejoras(),
+                        m.getRecomendaciones(),
+                        m.getClubes(),
+                        m.getCompras(),
+                        m.getAutoresFavoritos(),
+                        m.getBoletines()
+                );
                 list.add(p);
                 count++;
             }
@@ -350,15 +395,46 @@ public class SyncService {
             dashboardPostgresRepo.saveAll(list);
             totalSincronizados += list.size();
         }
-        System.out.println("📋 Sincronizadas " + list.size() + " respuestas dashboard nuevas");
+        System.out.println("Dashboard sincronizado: " + list.size());
     }
 
-    // ==================== MÉTODOS PARA SINCRONIZACIÓN EN TIEMPO REAL ====================
+    // ==================== MÉTODOS PÚBLICOS PARA SINCRONIZACIÓN EN TIEMPO REAL ====================
+
+    public void sincronizarLibro(LibroModel libro) {
+        try {
+            boolean existe = false;
+            for (LibroPostgres l : libroPostgresRepo.findAll()) {
+                if (l.getTitulo() != null && l.getTitulo().equals(libro.getTitulo())) {
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                LibroPostgres p = new LibroPostgres();
+                p.setId(UUID.randomUUID().toString());
+                p.setTitulo(libro.getTitulo());
+                p.setUrl(libro.getUrl());
+                p.setAutor(libro.getAutor());
+                p.setDescripcion(libro.getDescripcion());
+                p.setCategoria(libro.getCategoria());
+                libroPostgresRepo.save(p);
+                System.out.println("✅ Libro sincronizado a Neon: " + libro.getTitulo());
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error sincronizando libro: " + e.getMessage());
+        }
+    }
 
     public void sincronizarUsuario(Usuario usuario) {
         try {
-            boolean existe = usuarioPostgresRepo.findAll().stream()
-                    .anyMatch(u -> u.getUsername() != null && u.getUsername().equals(usuario.getUsername()));
+            boolean existe = false;
+            for (UsuarioPostgres u : usuarioPostgresRepo.findAll()) {
+                if (u.getUsername() != null && u.getUsername().equals(usuario.getUsername())) {
+                    existe = true;
+                    break;
+                }
+            }
 
             if (!existe) {
                 UsuarioPostgres p = new UsuarioPostgres();
@@ -378,79 +454,19 @@ public class SyncService {
         }
     }
 
-    public void sincronizarLibro(LibroModel libro) {
-        try {
-            boolean existe = libroPostgresRepo.findAll().stream()
-                    .anyMatch(l -> l.getTitulo() != null && l.getTitulo().equals(libro.getTitulo()));
-            if (!existe) {
-                LibroPostgres p = new LibroPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setTitulo(libro.getTitulo());
-                p.setUrl(libro.getUrl());
-                p.setAutor(libro.getAutor());
-                p.setDescripcion(libro.getDescripcion());
-                p.setCategoria(libro.getCategoria());
-                libroPostgresRepo.save(p);
-                System.out.println("✅ Libro sincronizado a Neon: " + libro.getTitulo());
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error sincronizando libro: " + e.getMessage());
-        }
-    }
-
-    public void sincronizarLibroFisico(LibroFisicoModel libro) {
-        try {
-            boolean existe = libroFisicoPostgresRepo.findAll().stream()
-                    .anyMatch(l -> l.getTitulo() != null && l.getTitulo().equals(libro.getTitulo()));
-            if (!existe) {
-                LibroFisicoPostgres p = new LibroFisicoPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setTitulo(libro.getTitulo());
-                p.setAutor(libro.getAutor());
-                p.setDescripcion(libro.getDescripcion());
-                p.setCategoria(libro.getCategoria());
-                p.setStock(libro.getStock());
-                p.setReservado(libro.getReservado());
-                libroFisicoPostgresRepo.save(p);
-                System.out.println("✅ Libro físico sincronizado a Neon: " + libro.getTitulo());
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error sincronizando libro físico: " + e.getMessage());
-        }
-    }
-
-    public void sincronizarReserva(ReservaModel reserva) {
-        try {
-            boolean existe = reservaPostgresRepo.findAll().stream()
-                    .anyMatch(r -> r.getIdUsuario() != null && r.getIdUsuario().equals(reserva.getIdUsuario())
-                            && r.getLibro() != null && r.getLibro().equals(reserva.getLibro()));
-            if (!existe) {
-                ReservaPostgres p = new ReservaPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setIdUsuario(reserva.getIdUsuario());
-                p.setNombreCompleto(reserva.getNombreCompleto());
-                p.setCorreo(reserva.getCorreo());
-                p.setCategoria(reserva.getCategoria());
-                p.setLibro(reserva.getLibro());
-                p.setFecha(reserva.getFecha());
-                reservaPostgresRepo.save(p);
-                System.out.println("✅ Reserva sincronizada a Neon");
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Error sincronizando reserva: " + e.getMessage());
-        }
-    }
-
     public void sincronizarResena(ResenaModel resena) {
         try {
-            boolean existe = resenaPostgresRepo.findAll().stream()
-                    .anyMatch(r -> r.getNombre() != null && r.getNombre().equals(resena.getNombre())
-                            && r.getComentario() != null && r.getComentario().equals(resena.getComentario()));
+            boolean existe = false;
+            for (ResenaPostgres r : resenaPostgresRepo.findAll()) {
+                if (r.getNombre() != null && r.getNombre().equals(resena.getNombre())
+                        && r.getComentario() != null && r.getComentario().equals(resena.getComentario())) {
+                    existe = true;
+                    break;
+                }
+            }
+
             if (!existe) {
-                ResenaPostgres p = new ResenaPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setNombre(resena.getNombre());
-                p.setComentario(resena.getComentario());
+                ResenaPostgres p = new ResenaPostgres(resena.getNombre(), resena.getComentario());
                 resenaPostgresRepo.save(p);
                 System.out.println("✅ Reseña sincronizada a Neon");
             }
@@ -459,14 +475,53 @@ public class SyncService {
         }
     }
 
-    // ✅ CORREGIDO: No asignar ID manualmente, usar constructor
+    public void sincronizarReserva(ReservaModel reserva) {
+        try {
+            String idLibro = cacheLibroId.get(reserva.getLibro());
+
+            boolean existe = false;
+            for (ReservaPostgres r : reservaPostgresRepo.findAll()) {
+                if (r.getIdUsuario() != null && r.getIdUsuario().equals(reserva.getIdUsuario())
+                        && r.getLibro() != null && r.getLibro().equals(reserva.getLibro())) {
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                ReservaPostgres p = new ReservaPostgres(
+                        reserva.getIdUsuario(),
+                        reserva.getNombreCompleto(),
+                        reserva.getCorreo(),
+                        reserva.getCategoria(),
+                        reserva.getLibro(),
+                        reserva.getFecha()
+                );
+                if (idLibro != null) {
+                    p.setIdLibro(idLibro);
+                }
+                reservaPostgresRepo.save(p);
+                System.out.println("✅ Reserva sincronizada a Neon");
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error sincronizando reserva: " + e.getMessage());
+        }
+    }
+
     public void sincronizarMulta(MultaModel multa) {
         try {
-            boolean existe = multaPostgresRepo.findAll().stream()
-                    .anyMatch(m -> m.getIdUsuario() != null && m.getIdUsuario().equals(multa.getIdUsuario())
-                            && m.getLibro() != null && m.getLibro().equals(multa.getLibro()));
+            String idLibro = cacheLibroId.get(multa.getLibro());
+
+            boolean existe = false;
+            for (MultaPostgres mt : multaPostgresRepo.findAll()) {
+                if (mt.getIdUsuario() != null && mt.getIdUsuario().equals(multa.getIdUsuario())
+                        && mt.getLibro() != null && mt.getLibro().equals(multa.getLibro())) {
+                    existe = true;
+                    break;
+                }
+            }
+
             if (!existe) {
-                // ✅ Usar el constructor sin ID (PostgreSQL lo genera automáticamente)
                 MultaPostgres p = new MultaPostgres(
                         multa.getIdUsuario(),
                         multa.getNombreUsuario(),
@@ -476,10 +531,12 @@ public class SyncService {
                         multa.getDiasRetraso(),
                         multa.getValorMulta()
                 );
-
+                if (idLibro != null) {
+                    p.setIdLibro(idLibro);
+                    p.setLibroTitulo(multa.getLibro());
+                }
                 p.setPagada(multa.isPagada());
                 p.setFechaPago(multa.getFechaPago());
-
                 multaPostgresRepo.save(p);
                 System.out.println("✅ Multa sincronizada a Neon");
             }
@@ -490,12 +547,16 @@ public class SyncService {
 
     public void sincronizarProgresoLectura(ProgresoLectura progreso) {
         try {
-            boolean existe = progresoPostgresRepo.findAll().stream()
-                    .anyMatch(p -> p.getUsername() != null && p.getUsername().equals(progreso.getUsername()));
+            boolean existe = false;
+            for (ProgresoLecturaPostgres p : progresoPostgresRepo.findAll()) {
+                if (p.getUsername() != null && p.getUsername().equals(progreso.getUsername())) {
+                    existe = true;
+                    break;
+                }
+            }
+
             if (!existe) {
-                ProgresoLecturaPostgres p = new ProgresoLecturaPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setUsername(progreso.getUsername());
+                ProgresoLecturaPostgres p = new ProgresoLecturaPostgres(progreso.getUsername());
                 p.setTotalLibrosLeidos(progreso.getTotalLibrosLeidos());
                 p.setUltimaActualizacion(progreso.getUltimaActualizacion());
                 p.setPuntos(progreso.getPuntos());
@@ -507,7 +568,7 @@ public class SyncService {
                     p.setCapitulosPorLibro("{}");
                 }
                 progresoPostgresRepo.save(p);
-                System.out.println("✅ Progreso lectura sincronizado a Neon");
+                System.out.println("✅ Progreso lectura sincronizado a Neon: " + progreso.getUsername());
             }
         } catch (Exception e) {
             System.err.println("❌ Error sincronizando progreso lectura: " + e.getMessage());
@@ -516,31 +577,36 @@ public class SyncService {
 
     public void sincronizarRespuestaDashboard(RespuestaDashboard respuesta) {
         try {
-            boolean existe = dashboardPostgresRepo.findAll().stream()
-                    .anyMatch(d -> d.getGenero() != null && d.getGenero().equals(respuesta.getGenero())
-                            && d.getEdad() != null && d.getEdad().equals(respuesta.getEdad()));
+            boolean existe = false;
+            for (RespuestaDashboardPostgres d : dashboardPostgresRepo.findAll()) {
+                if (d.getGenero() != null && d.getGenero().equals(respuesta.getGenero())
+                        && d.getEdad() != null && d.getEdad().equals(respuesta.getEdad())) {
+                    existe = true;
+                    break;
+                }
+            }
+
             if (!existe) {
-                RespuestaDashboardPostgres p = new RespuestaDashboardPostgres();
-                p.setId(UUID.randomUUID().toString());
-                p.setEdad(respuesta.getEdad());
-                p.setGenero(respuesta.getGenero());
-                p.setEducacion(respuesta.getEducacion());
-                p.setFrecuencia(respuesta.getFrecuencia());
-                p.setCategoriaFavorita(respuesta.getCategoriaFavorita());
-                p.setFormato(respuesta.getFormato());
-                p.setUso(respuesta.getUso());
-                p.setLibrosMes(respuesta.getLibrosMes());
-                p.setCalificacion(respuesta.getCalificacion());
-                p.setRecomendacion(respuesta.getRecomendacion());
-                p.setDispositivos(respuesta.getDispositivos());
-                p.setUltimoLibro(respuesta.getUltimoLibro());
-                p.setMejoras(respuesta.getMejoras());
-                p.setRecomendaciones(respuesta.getRecomendaciones());
-                p.setClubes(respuesta.getClubes());
-                p.setCompras(respuesta.getCompras());
-                p.setAutoresFavoritos(respuesta.getAutoresFavoritos());
-                p.setBoletines(respuesta.getBoletines());
-                p.setFechaRegistro(respuesta.getFechaRegistro());
+                RespuestaDashboardPostgres p = new RespuestaDashboardPostgres(
+                        respuesta.getEdad(),
+                        respuesta.getGenero(),
+                        respuesta.getEducacion(),
+                        respuesta.getFrecuencia(),
+                        respuesta.getCategoriaFavorita(),
+                        respuesta.getFormato(),
+                        respuesta.getUso(),
+                        respuesta.getLibrosMes(),
+                        respuesta.getCalificacion(),
+                        respuesta.getRecomendacion(),
+                        respuesta.getDispositivos(),
+                        respuesta.getUltimoLibro(),
+                        respuesta.getMejoras(),
+                        respuesta.getRecomendaciones(),
+                        respuesta.getClubes(),
+                        respuesta.getCompras(),
+                        respuesta.getAutoresFavoritos(),
+                        respuesta.getBoletines()
+                );
                 dashboardPostgresRepo.save(p);
                 System.out.println("✅ Respuesta dashboard sincronizada a Neon");
             }
@@ -549,7 +615,33 @@ public class SyncService {
         }
     }
 
-    // ==================== MÉTODOS PARA ESTADÍSTICAS ====================
+    public void sincronizarLibroFisico(LibroFisicoModel libroFisico) {
+        try {
+            boolean existe = false;
+            for (LibroFisicoPostgres l : libroFisicoPostgresRepo.findAll()) {
+                if (l.getTitulo() != null && l.getTitulo().equals(libroFisico.getTitulo())) {
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                LibroFisicoPostgres p = new LibroFisicoPostgres();
+                p.setId(UUID.randomUUID().toString());
+                p.setIdLibro(cacheLibroId.get(libroFisico.getTitulo()));
+                p.setTitulo(libroFisico.getTitulo());
+                p.setAutor(libroFisico.getAutor());
+                p.setDescripcion(libroFisico.getDescripcion());
+                p.setCategoria(libroFisico.getCategoria());
+                p.setStock(libroFisico.getStock());
+                p.setReservado(libroFisico.getReservado());
+                libroFisicoPostgresRepo.save(p);
+                System.out.println("✅ Libro físico sincronizado a Neon: " + libroFisico.getTitulo());
+            }
+        } catch (Exception e) {
+            System.err.println("❌ Error sincronizando libro físico: " + e.getMessage());
+        }
+    }
 
     public static LocalDateTime getUltimaSincronizacion() {
         return ultimaSincronizacion;

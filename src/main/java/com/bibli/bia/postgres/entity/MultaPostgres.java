@@ -1,9 +1,10 @@
 package com.bibli.bia.postgres.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.time.LocalDate;
 
 @Data
@@ -24,7 +25,13 @@ public class MultaPostgres {
     private String nombreUsuario;
 
     @Column(name = "libro")
-    private String libro;
+    private String libro;  // ← Mantenemos el campo original
+
+    @Column(name = "id_libro")
+    private String idLibro;
+
+    @Column(name = "libro_titulo")
+    private String libroTitulo;
 
     @Column(name = "fecha_reserva")
     private LocalDate fechaReserva;
@@ -44,13 +51,30 @@ public class MultaPostgres {
     @Column(name = "fecha_pago")
     private LocalDate fechaPago;
 
-    // Constructor sin ID
+    // Constructor original (sin idLibro) - para mantener compatibilidad
     public MultaPostgres(String idUsuario, String nombreUsuario, String libro,
                          LocalDate fechaReserva, LocalDate fechaDevolucion,
                          int diasRetraso, double valorMulta) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
         this.libro = libro;
+        this.fechaReserva = fechaReserva;
+        this.fechaDevolucion = fechaDevolucion;
+        this.diasRetraso = diasRetraso;
+        this.valorMulta = valorMulta;
+        this.pagada = false;
+        this.fechaPago = null;
+    }
+
+    // Constructor con idLibro
+    public MultaPostgres(String idUsuario, String nombreUsuario, String libro, String idLibro, String libroTitulo,
+                         LocalDate fechaReserva, LocalDate fechaDevolucion,
+                         int diasRetraso, double valorMulta) {
+        this.idUsuario = idUsuario;
+        this.nombreUsuario = nombreUsuario;
+        this.libro = libro;
+        this.idLibro = idLibro;
+        this.libroTitulo = libroTitulo;
         this.fechaReserva = fechaReserva;
         this.fechaDevolucion = fechaDevolucion;
         this.diasRetraso = diasRetraso;

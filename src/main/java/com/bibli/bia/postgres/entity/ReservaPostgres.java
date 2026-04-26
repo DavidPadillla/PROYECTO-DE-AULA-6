@@ -15,7 +15,7 @@ public class ReservaPostgres {
 
     @Id
     @Column(columnDefinition = "TEXT")
-    private String id;  // ✅ Cambiado: de Long a String para TEXT en BD
+    private String id;
 
     @Column(name = "id_usuario", columnDefinition = "TEXT")
     private String idUsuario;
@@ -32,9 +32,12 @@ public class ReservaPostgres {
     @Column(columnDefinition = "TEXT")
     private String libro;
 
+    @Column(name = "id_libro", columnDefinition = "TEXT")
+    private String idLibro;
+
     private LocalDate fecha;
 
-    // Constructor sin ID (genera UUID automáticamente)
+    // Constructor original (sin idLibro)
     public ReservaPostgres(String idUsuario, String nombreCompleto, String correo, String categoria, String libro, LocalDate fecha) {
         this.id = java.util.UUID.randomUUID().toString();
         this.idUsuario = idUsuario;
@@ -42,6 +45,18 @@ public class ReservaPostgres {
         this.correo = correo;
         this.categoria = categoria;
         this.libro = libro;
+        this.fecha = fecha;
+    }
+
+    // Constructor con idLibro
+    public ReservaPostgres(String idUsuario, String nombreCompleto, String correo, String categoria, String libro, String idLibro, LocalDate fecha) {
+        this.id = java.util.UUID.randomUUID().toString();
+        this.idUsuario = idUsuario;
+        this.nombreCompleto = nombreCompleto;
+        this.correo = correo;
+        this.categoria = categoria;
+        this.libro = libro;
+        this.idLibro = idLibro;
         this.fecha = fecha;
     }
 }

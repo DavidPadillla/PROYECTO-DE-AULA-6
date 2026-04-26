@@ -14,7 +14,7 @@ public class LibroPostgres {
 
     @Id
     @Column(columnDefinition = "TEXT")
-    private String id;  // Cambiado de Long a String para coincidir con TEXT en BD
+    private String id;
 
     @Column(columnDefinition = "TEXT")
     private String titulo;
@@ -30,5 +30,4 @@ public class LibroPostgres {
 
     @Column(columnDefinition = "TEXT")
     private String categoria;
-
 }
