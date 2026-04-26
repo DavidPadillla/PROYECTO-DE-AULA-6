@@ -292,6 +292,373 @@
             background: linear-gradient(135deg, #a855f7 0%, #d946ef 100%) !important;
             border-color: #d946ef !important;
         }
+
+        /* ========== BURBUJA FLOTANTE DE CHAT ========== */
+
+        /* Burbuja principal */
+        .chat-bubble {
+            position: fixed;
+            bottom: 30px;
+            right: 100px;
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            animation: bubble-float 3s ease-in-out infinite;
+        }
+
+        .chat-bubble:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.6);
+        }
+
+        @keyframes bubble-float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .chat-bubble i {
+            font-size: 28px;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .chat-bubble:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Tooltip flotante */
+        .chat-tooltip {
+            position: fixed;
+            bottom: 105px;
+            right: 180px;
+            background: #1e293b;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        .chat-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #1e293b;
+        }
+
+        .chat-bubble:hover + .chat-tooltip,
+        .chat-tooltip:hover {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        /* Ventana de chat */
+        .chat-window {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 350px;
+            height: 480px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1001;
+            transform-origin: bottom right;
+        }
+
+        .chat-window.active {
+            transform: scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Header del chat */
+        .chat-header {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-header h3 i {
+            font-size: 1.2rem;
+        }
+
+        .chat-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chat-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: rotate(90deg);
+        }
+
+        /* Cuerpo del chat */
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Mensajes del chat */
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            animation: messageSlideIn 0.3s ease;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-avatar {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar i {
+            font-size: 18px;
+            color: white;
+        }
+
+        .chat-bubble-msg {
+            background: white;
+            padding: 10px 14px;
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            max-width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .chat-bubble-msg p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.4;
+        }
+
+        .chat-bubble-msg .chat-time {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Mensaje del usuario */
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+
+        .chat-message.user .chat-avatar {
+            order: 2;
+            background: #e2e8f0;
+        }
+
+        .chat-message.user .chat-avatar i {
+            color: #64748b;
+        }
+
+        .chat-message.user .chat-bubble-msg {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 4px;
+        }
+
+        .chat-message.user .chat-bubble-msg p {
+            color: white;
+        }
+
+        .chat-message.user .chat-bubble-msg .chat-time {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Footer del chat */
+        .chat-footer {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-footer input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .chat-footer button {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-footer button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(124, 58, 237, 0.4);
+        }
+
+        /* Indicador de escritura */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-6px);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive para móvil */
+        @media (max-width: 480px) {
+            .chat-window {
+                width: calc(100% - 40px);
+                right: 20px;
+                bottom: 90px;
+                height: 450px;
+            }
+
+            .chat-bubble {
+                right: 20px;
+                bottom: 20px;
+                width: 55px;
+                height: 55px;
+            }
+
+            .chat-tooltip {
+                right: 90px;
+                bottom: 85px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+            }
+
+            .scroll-to-top {
+                right: 20px;
+                bottom: 90px;
+            }
+        }
+
+        /* Ajuste para que scroll-to-top no choque con la burbuja */
+        @media (min-width: 481px) {
+            .scroll-to-top {
+                right: 100px;
+                bottom: 30px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -318,6 +685,43 @@
             <button class="logout-confirm" id="logoutConfirm">Sí, cerrar sesión</button>
             <button class="logout-cancel" id="logoutCancel">Cancelar</button>
         </div>
+    </div>
+</div>
+
+<!-- ========== BURBUJA FLOTANTE DE CHAT ========== -->
+<div class="chat-bubble" id="chatBubble">
+    <i class="fas fa-comment-dots"></i>
+</div>
+<div class="chat-tooltip" id="chatTooltip">
+    💬 ¿Necesitas ayuda?
+</div>
+
+<div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+        <h3>
+            <i class="fas fa-robot"></i>
+            Asistente Virtual
+        </h3>
+        <button class="chat-close" id="chatClose">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="chat-body" id="chatBody">
+        <div class="chat-message">
+            <div class="chat-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-bubble-msg">
+                <p>¡Hola! 👋 Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?</p>
+                <span class="chat-time">Ahora</span>
+            </div>
+        </div>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." autocomplete="off">
+        <button id="chatSend">
+            <i class="fas fa-paper-plane"></i>
+        </button>
     </div>
 </div>
 
@@ -354,7 +758,7 @@
     </div>
 </header>
 
-<!-- Secciones (igual) -->
+<!-- Secciones -->
 <section class="hero" id="inicio">
     <div class="hero-video-container">
         <video autoplay loop muted playsinline class="hero-video">
@@ -590,6 +994,158 @@
         if (e.key === 'Escape' && logoutModal.classList.contains('active')) {
             logoutModal.classList.remove('active');
         }
+    });
+
+    // ========== LÓGICA DEL CHAT FLOTANTE ==========
+
+    const chatBubble = document.getElementById('chatBubble');
+    const chatWindow = document.getElementById('chatWindow');
+    const chatClose = document.getElementById('chatClose');
+    const chatInput = document.getElementById('chatInput');
+    const chatSend = document.getElementById('chatSend');
+    const chatBody = document.getElementById('chatBody');
+
+    // Abrir chat
+    chatBubble.addEventListener('click', () => {
+        chatWindow.classList.add('active');
+    });
+
+    // Cerrar chat
+    chatClose.addEventListener('click', () => {
+        chatWindow.classList.remove('active');
+    });
+
+    // Función para agregar mensaje
+    function addMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${isUser ? 'user' : ''}`;
+
+        const now = new Date();
+        const timeString = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+        if (isUser) {
+            messageDiv.innerHTML = `
+                <div class="chat-bubble-msg">
+                    <p>${escapeHtml(message)}</p>
+                    <span class="chat-time">${timeString}</span>
+                </div>
+                <div class="chat-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="chat-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chat-bubble-msg">
+                    <p>${escapeHtml(message)}</p>
+                    <span class="chat-time">${timeString}</span>
+                </div>
+            `;
+        }
+
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // Función para escapar HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Mostrar indicador de escritura
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <div class="chat-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        `;
+        chatBody.appendChild(typingDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        const indicator = document.getElementById('typingIndicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    // Respuestas automáticas (simulando un chatbot)
+    function getBotResponse(userMessage) {
+        const msg = userMessage.toLowerCase();
+
+        if (msg.includes('hola') || msg.includes('buenas') || msg.includes('saludo')) {
+            return "¡Hola! 👋 Soy el asistente de Lectio. ¿Cómo puedo ayudarte hoy? Puedes preguntarme sobre libros, horarios, préstamos o cualquier otra cosa.";
+        }
+        else if (msg.includes('libro') || msg.includes('leer') || msg.includes('colección')) {
+            return "📚 Nuestra colección tiene más de 10,000 libros físicos y digitales. Puedes explorar la sección 'Colección' o 'Libros Virtuales' para encontrar lecturas increíbles. ¿Buscas algún género en especial?";
+        }
+        else if (msg.includes('horario') || msg.includes('abren') || msg.includes('atencion')) {
+            return "⏰ Nuestro horario de atención es de lunes a viernes de 8:00 AM a 8:00 PM, y sábados de 9:00 AM a 2:00 PM. ¿Necesitas más información?";
+        }
+        else if (msg.includes('prestamo') || msg.includes('reserva') || msg.includes('pedir')) {
+            return "📖 Para reservar un libro, ve a la sección 'Reserva' en el menú principal. Allí podrás seleccionar el libro que deseas y solicitar su préstamo. ¿Te ayudo con algo más?";
+        }
+        else if (msg.includes('ayuda') || msg.includes('problema') || msg.includes('soporte')) {
+            return "🆗 Claro, puedo ayudarte. Puedes contactarnos por correo a servicios@booklab.gov.co o llamar al (+57 601) 3424100. También puedes revisar la sección 'Ayuda' del menú.";
+        }
+        else if (msg.includes('gracias') || msg.includes('excelente') || msg.includes('buen')) {
+            return "¡De nada! 😊 Estoy aquí para ayudarte. Si necesitas algo más, solo dímelo.";
+        }
+        else if (msg.includes('autor') || msg.includes('escritor')) {
+            return "✍️ Algunos de nuestros autores destacados son Gabriel García Márquez, Isabel Allende y Jorge Luis Borges. ¿Te gustaría conocer más sobre alguno de ellos?";
+        }
+        else if (msg.includes('cuento') || msg.includes('historia') || msg.includes('recomienda')) {
+            return "📖 ¡Claro! Te recomiendo 'El Gran Libro del Conocimiento' si te gusta aprender, o 'Misterios del Universo' si te fascina el cosmos. ¿Qué tipo de lectura prefieres?";
+        }
+        else {
+            return "🤔 Gracias por tu mensaje. Nuestro equipo de soporte lo revisará pronto. Mientras tanto, ¿puedo ayudarte con algo específico? Puedes preguntarme sobre horarios, préstamos, autores o colecciones.";
+        }
+    }
+
+    // Enviar mensaje
+    function sendMessage() {
+        const message = chatInput.value.trim();
+        if (message === '') return;
+
+        // Agregar mensaje del usuario
+        addMessage(message, true);
+        chatInput.value = '';
+
+        // Mostrar indicador de escritura
+        showTypingIndicator();
+
+        // Simular respuesta del bot después de un pequeño delay
+        setTimeout(() => {
+            hideTypingIndicator();
+            const response = getBotResponse(message);
+            addMessage(response, false);
+        }, 800);
+    }
+
+    // Eventos para enviar mensaje
+    chatSend.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Evitar que el chat se cierre al hacer clic dentro
+    chatWindow.addEventListener('click', (e) => {
+        e.stopPropagation();
     });
 </script>
 </body>

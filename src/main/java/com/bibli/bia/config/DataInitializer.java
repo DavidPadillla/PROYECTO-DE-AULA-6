@@ -1,4 +1,4 @@
-/*package com.bibli.bia.config;
+package com.bibli.bia.config;
 
 import com.bibli.bia.Model.Usuario;
 import com.bibli.bia.repository.UsuarioRepository;
@@ -40,4 +40,3 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 }
-*/

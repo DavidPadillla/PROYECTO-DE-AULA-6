@@ -2,6 +2,7 @@ package com.bibli.bia.service;
 
 import com.bibli.bia.Model.ProgresoLectura;
 import com.bibli.bia.repository.ProgresoLecturaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -10,6 +11,9 @@ import java.util.*;
 public class ProgresoLecturaService {
 
     private final ProgresoLecturaRepository progresoRepository;
+
+    @Autowired
+    private SyncService syncService;  // ← AGREGAR ESTO
 
     public ProgresoLecturaService(ProgresoLecturaRepository progresoRepository) {
         this.progresoRepository = progresoRepository;
@@ -22,7 +26,9 @@ public class ProgresoLecturaService {
             return progreso.get();
         } else {
             ProgresoLectura nuevoProgreso = new ProgresoLectura(username);
-            return progresoRepository.save(nuevoProgreso);
+            ProgresoLectura saved = progresoRepository.save(nuevoProgreso);
+            syncService.sincronizarProgresoLectura(saved);  // ← SINCRONIZAR
+            return saved;
         }
     }
 
@@ -45,7 +51,9 @@ public class ProgresoLecturaService {
 
         progreso.setUltimaActualizacion(LocalDateTime.now());
 
-        return progresoRepository.save(progreso);
+        ProgresoLectura saved = progresoRepository.save(progreso);
+        syncService.sincronizarProgresoLectura(saved);  // ← SINCRONIZAR
+        return saved;
     }
 
     public ProgresoLectura marcarLibroCompletado(String username, String libroId) {
@@ -60,7 +68,9 @@ public class ProgresoLecturaService {
 
         progreso.setUltimaActualizacion(LocalDateTime.now());
 
-        return progresoRepository.save(progreso);
+        ProgresoLectura saved = progresoRepository.save(progreso);
+        syncService.sincronizarProgresoLectura(saved);  // ← SINCRONIZAR
+        return saved;
     }
 
     public boolean haCompletadoLibro(String username, String libroId) {
@@ -70,6 +80,9 @@ public class ProgresoLecturaService {
 
     public void reiniciarProgreso(String username) {
         Optional<ProgresoLectura> progreso = progresoRepository.findByUsername(username);
-        progreso.ifPresent(progresoRepository::delete);
+        if (progreso.isPresent()) {
+            progresoRepository.delete(progreso.get());
+            System.out.println("⚠️ Progreso eliminado de MongoDB. Neon no se actualiza automáticamente.");
+        }
     }
 }

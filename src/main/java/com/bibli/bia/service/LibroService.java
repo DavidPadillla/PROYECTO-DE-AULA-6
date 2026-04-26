@@ -13,24 +13,24 @@ public class LibroService {
     @Autowired
     private LibroRepository libroRepository;
 
+    @Autowired
+    private SyncService syncService;
 
     public LibroModel guardarLibro(LibroModel libro) {
-        return libroRepository.save(libro);
+        LibroModel saved = libroRepository.save(libro);
+        syncService.sincronizarLibro(saved);
+        return saved;
     }
-
 
     public List<LibroModel> obtenerTodosLosLibros() {
         return libroRepository.findAll();
     }
 
-
     public List<LibroModel> obtenerLibrosPorCategoria(String categoria) {
         return libroRepository.findByCategoria(categoria);
     }
 
-
     public void eliminarLibro(String id) {
         libroRepository.deleteById(id);
     }
-
 }

@@ -20,6 +20,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.bibli.bia.service.SyncService;  // ← Agregar este import
+import java.time.LocalDateTime;              // ← Ya debería estar
+import java.util.HashMap;                    // ← Ya debería estar
+import java.util.Map;                        // ← Ya debería estar
 
 @Controller
 @RequestMapping("/api")
@@ -690,4 +694,54 @@ public class WebController {
         model.addAttribute("librosFisicos", libroFisicoService.obtenerTodosLosLibrosFisicos());
         return "reservaLibro";
     }
+    // ==================== SINCRONIZACIÓN MONGODB → POSTGRESQL ====================
+
+    @Autowired
+    private SyncService syncService;
+
+    /**
+     * Endpoint para ejecutar la sincronización manualmente
+     * GET o POST: http://localhost:8080/api/sync/run
+     */
+    @GetMapping("/sync/run")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> sincronizarManual() {
+        long startTime = System.currentTimeMillis();
+
+        try {
+            syncService.sincronizarTodo();
+            long duration = System.currentTimeMillis() - startTime;
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "✅ Sincronización completada exitosamente");
+            response.put("duration", duration + " ms");
+            response.put("timestamp", LocalDateTime.now().toString());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", "❌ Error en la sincronización: " + e.getMessage());
+            response.put("timestamp", LocalDateTime.now().toString());
+
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    /**
+     * Endpoint para verificar el estado de la última sincronización
+     * GET: http://localhost:8080/api/sync/status
+     */
+    @GetMapping("/sync/status")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> sincronizarStatus() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("ultima_sincronizacion", SyncService.getUltimaSincronizacion());
+        response.put("total_sincronizados", SyncService.getTotalSincronizados());
+        response.put("estado", "activo");
+        return ResponseEntity.ok(response);
+    }
+
 }

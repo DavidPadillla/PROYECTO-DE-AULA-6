@@ -12,7 +12,7 @@ import java.util.Set;
 public class Usuario {
 
     @Id
-    private String id; // En MongoDB el id es normalmente un ObjectId (String)
+    private String id;
 
     private String username;
     private String password;

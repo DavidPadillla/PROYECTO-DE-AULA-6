@@ -15,26 +15,26 @@ public class MultaService {
     @Autowired
     private MultaRepository multaRepository;
 
+    @Autowired
+    private SyncService syncService;  // ← AGREGAR ESTO
 
     public MultaModel crearMulta(MultaModel multa) {
-        return multaRepository.save(multa);
+        MultaModel saved = multaRepository.save(multa);
+        syncService.sincronizarMulta(saved);  // ← SINCRONIZAR
+        return saved;
     }
-
 
     public List<MultaModel> obtenerMultasPorUsuario(String idUsuario) {
         return multaRepository.findByIdUsuario(idUsuario);
     }
 
-
     public List<MultaModel> obtenerMultasPorNombre(String nombreUsuario) {
         return multaRepository.findByNombreUsuarioContainingIgnoreCase(nombreUsuario);
     }
 
-
     public List<MultaModel> obtenerMultasPendientes() {
         return multaRepository.findByPagada(false);
     }
-
 
     public MultaModel marcarComoPagada(String idMulta) {
         Optional<MultaModel> multaOpt = multaRepository.findById(idMulta);
@@ -43,25 +43,24 @@ public class MultaService {
             if (!multa.isPagada()) {
                 multa.setPagada(true);
                 multa.setFechaPago(LocalDate.now());
-                return multaRepository.save(multa);
+                MultaModel saved = multaRepository.save(multa);
+                syncService.sincronizarMulta(saved);  // ← SINCRONIZAR
+                return saved;
             }
-            // Si ya está pagada, devolverla sin cambios o null según lógica
             return multa;
         }
         return null;
     }
 
-    // Eliminar multa por id
     public void eliminarMulta(String idMulta) {
         multaRepository.deleteById(idMulta);
+        System.out.println("⚠️ Multa eliminada de MongoDB. Neon no se actualiza automáticamente.");
     }
 
-    // Obtener todas las multas
     public List<MultaModel> obtenerTodasMultas() {
         return multaRepository.findAll();
     }
 
-    // Obtener multas ya pagadas
     public List<MultaModel> obtenerMultasPagadas() {
         return multaRepository.findByPagada(true);
     }
